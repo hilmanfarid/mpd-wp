@@ -1,0 +1,103 @@
+body {
+	background: #CCD9E8;
+	margin: 0px;
+	padding: 0px;
+	font-family: "trebuchet ms", "luxi sans", verdana, helvetica, sans-serif;
+	font-size:11px;
+}
+textarea[name="bphtb_info"]{
+    font-family:courier;
+}
+.page-header{
+	background: url("../images/hd-bg.gif") repeat-x;
+	height:39px;
+	margin:0px;
+	padding:0px;
+}
+
+.logo{
+	background: url("../images/logo.png") no-repeat;
+	height:28px;
+	margin-left: 5px;
+}
+
+body.login .page-header{
+	/*background: url("../images/header1.png") no-repeat;*/
+	height:150px;
+	width:100%;
+	margin: 0px;
+	padding: 0px 0px 0px 0px;   
+	background-position: center top;
+    /* MARGIN-TOP: -1%; */
+    BOX-SHADOW: 0PX 0PX 60PX 0PX rgb(0, 139, 255);
+    TEXT-SHADOW: 3PX 3PX 1PX rgb(162, 216, 223);
+	background: url("../images/logo_pemkot_bdg.png") no-repeat;
+	background-size: 172px 132px;
+	background-position: 14px 7px;
+}
+
+body.login .page-header H1{
+	PADDING-TOP: 1%;
+	font-size: 47px;
+    line-height: 58px;
+	color: #1B890F;
+}
+body.login .page-header .logo{
+	background: url("../images/logo-login.png") no-repeat;
+	height:122px;
+	margin-left: 5px;
+	padding-top: 25px;
+}
+
+body.login{
+	background: url("../images/Background-s.jpg") repeat right;
+}
+
+.page-body{
+
+}
+
+body.login .page-body{
+    text-align: center;
+}
+
+.page-footer{
+
+}
+
+.clear {
+    clear:both;
+}
+
+/* LoginForm */
+
+.loginform {
+	
+	width: 370px;
+	height: 300px;
+	margin: 0px auto;
+	/*background: url("../images/login-box.png") no-repeat center;*/
+}
+
+.loginform-title {
+	margin-top:50px;
+	color:#1B890F;
+	font-size:30;
+}
+.loginform-content {
+    padding-top:25px;
+	padding-bottom:25px;
+	text-align: center;
+	box-shadow: 6px 6px 25px 15px rgb(21, 170, 205);
+	color:#1B890F;
+	font-size:20;
+	border-radius: 10px;
+}
+
+.loginform-content input{
+    margin:3px 0px;
+}
+
+.errormsg{
+    color:#FF0000;
+}

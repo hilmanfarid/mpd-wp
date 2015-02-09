@@ -1,0 +1,76 @@
+body {
+	background: #CCD9E8;
+	margin: 0px;
+	padding: 0px;
+	font-family: "trebuchet ms", "luxi sans", verdana, helvetica, sans-serif;
+	font-size:11px;
+}
+
+.page-header{
+	background: url("../images/hd-bg.gif") repeat-x;
+	height:39px;
+	margin:0px;
+	padding:0px;
+}
+
+.logo{
+	background: url("../images/logo.png") no-repeat;
+	height:28px;
+	margin-left: 5px;
+}
+
+body.login .page-header{
+	background: url("../images/loginbg2.png") repeat-x;
+	height:122px;
+	margin: 0px;
+	padding: 0px 0px 0px 0px;    
+}
+
+body.login .page-header .logo{
+	background: url("../images/logo-login.png") no-repeat;
+	height:122px;
+	margin-left: 5px;
+	padding-top: 25px;
+}
+
+.page-body{
+
+}
+
+body.login .page-body{
+    text-align: center;
+}
+
+.page-footer{
+
+}
+
+.clear {
+    clear:both;
+}
+
+/* LoginForm */
+
+.loginform {
+	
+	width: 370px;
+	height: 300px;
+	margin: 0px auto;
+	background: url("../images/login-box.png") no-repeat center;
+}
+
+.loginform-title {
+	margin-top:50px;
+}
+.loginform-content {
+    padding-top:110px;
+	text-align: center;
+}
+
+.loginform-content input{
+    margin:3px 0px;
+}
+
+.errormsg{
+    color:#FF0000;
+}

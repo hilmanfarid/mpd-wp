@@ -91,6 +91,8 @@ class t_cust_order_legal_doc_controller extends wbController{
 		    			'limit' => $limit);
 		    
             $ws_data = self::getResultData($ws_client, $params);  
+			print_r($ws_data);
+			exit;
 			$filename = $thumbnail = '';
     	    if($ws_data['success']){
 				try{        

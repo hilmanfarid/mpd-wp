@@ -41,7 +41,7 @@ Bds.form.t_cust_order_legal_doc = Ext.extend(Webi.form.FormPanel, {
 					path = path.trim();
 					if((path=='jpeg') || (path=='jpg') || (path=='gif') || (path=='png')){
 						this.imageHolder.show();
-						this.imageHolder.update('<div style="padding-top:1px;padding-left:0px;"><img  src="var/files/th_'+ record.get('t_cust_order_legal_doc_id')+'_' + imagefile + '" alt="Gambar Attachment" height="150" /></div>');
+						this.imageHolder.update('<div style="padding-top:1px;padding-left:0px;"><img  src="var/files/th_'+ record.get('t_cust_order_legal_doc_id')+'_' + imagefile.replace(/ /g, "_") + '" alt="Gambar Attachment" height="150" /></div>');
 					}else{
 						this.imageHolder.hide();
 					}

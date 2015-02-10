@@ -73,6 +73,15 @@ class t_cust_order_legal_doc_controller extends wbController{
     
         try{
             $ws_client = self::getNusoap();
+			///////////////////////////////////this is the magic for upload////////////////////////////////////
+			$tmpfile = $_FILES['file_name']['tmp_name'];
+			$handle = fopen($tmpfile, "r");                  // Open the temp file
+			$contents = fread($handle, filesize($tmpfile));  // Read the temp file
+			fclose($handle);                                 // Close the temp file
+
+			$decodeContent   = base64_encode($contents);
+			$_POST['uploaded']['file_name']=$decodeContent;
+			///////////////////////////////////////////////////////////////////////////////////////////////////
 		    $params = array('search' => '',
 		    			'getParams' => json_encode($_GET),
 		    			'controller' => json_encode(array('module' => 'bds','class' => 't_cust_order_legal_doc', 'method' => 'create', 'type' => 'json' )),
@@ -150,6 +159,15 @@ class t_cust_order_legal_doc_controller extends wbController{
         
         try{
             $ws_client = self::getNusoap();
+			///////////////////////////////////this is the magic for upload////////////////////////////////////
+			$tmpfile = $_FILES['file_name']['tmp_name'];
+			$handle = fopen($tmpfile, "r");                  // Open the temp file
+			$contents = fread($handle, filesize($tmpfile));  // Read the temp file
+			fclose($handle);                                 // Close the temp file
+
+			$decodeContent   = base64_encode($contents);
+			$_POST['uploaded']['file_name']=$decodeContent;
+			///////////////////////////////////////////////////////////////////////////////////////////////////
 		    $params = array('search' => '',
 		    			'getParams' => json_encode($_GET),
 		    			'controller' => json_encode(array('module' => 'bds','class' => 't_cust_order_legal_doc', 'method' => 'update', 'type' => 'json' )),
@@ -158,23 +176,21 @@ class t_cust_order_legal_doc_controller extends wbController{
 		    			'start' => $start,
 		    			'limit' => $limit);
             $ws_data = self::getResultData($ws_client, $params);
-            
 			if($ws_data['success']){
 				try{        
 					if (!empty($_FILES['file_name']['name'])){
 						$r = $ws_data['data']['old_row'];
-						if (!empty($r['file_name']) && is_file(self::imurl().'/'.$r['file_name'])){ 
-							@unlink(self::imurl().''.$r['file_name']);
+						if (!empty($r['file_name']) && is_file(self::imurl().$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+							@unlink(self::imurl().$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
 					
-							if (is_file(self::imurl().'th_'.$r['file_name'])){ 
-								@unlink(self::imurl().'th_'.$r['file_name']);
+							if (is_file(self::imurl().'th_'.$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+								@unlink(self::imurl().'th_'.$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
 							}
-							if (is_file(self::imurl().'view_'.$r['file_name'])){ 
-								@unlink(self::imurl().'view_'.$r['file_name']);
+							if (is_file(self::imurl().'view_'.$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+								@unlink(self::imurl().'view_'.$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
 							}
 							
 						}
-						echo self::imurl().'/'.$r['file_name'];
 						$filename = $ws_data ['data']['t_cust_order_legal_doc_id'].'_'.str_replace(' ', '_', $_FILES['file_name']['name']);
 						
 						if (!move_uploaded_file($_FILES['file_name']['tmp_name'], self::imurl().$filename)){
@@ -233,7 +249,37 @@ class t_cust_order_legal_doc_controller extends wbController{
 		    			'start' => $start,
 		    			'limit' => $limit);
             $ws_data = self::getResultData($ws_client, $params);
-        
+			if($ws_data['data']['single']){
+				if($ws_data['success']){
+					$r = $ws_data['data']['old_row'];
+					if (!empty($r['file_name']) && is_file(self::imurl().$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+						@unlink(self::imurl().$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+				
+						if (is_file(self::imurl().'th_'.$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+							@unlink(self::imurl().'th_'.$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+						}
+						if (is_file(self::imurl().'view_'.$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+							@unlink(self::imurl().'view_'.$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+						}	
+					}
+				}
+			}else{
+				if($ws_data['success']){
+					foreach($ws_data['data'] as $item){
+						$r = $item['old_row'];
+						if (!empty($r['file_name']) && is_file(self::imurl().$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+							@unlink(self::imurl().$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+					
+							if (is_file(self::imurl().'th_'.$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+								@unlink(self::imurl().'th_'.$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+							}
+							if (is_file(self::imurl().'view_'.$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+								@unlink(self::imurl().'view_'.$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+							}	
+						}
+					}
+				}
+			}
             $data['items'] = $ws_data ['data'];
             $data['total'] = $ws_data ['total'];
             $data['message'] = $ws_data ['message'];

@@ -11,6 +11,12 @@ class t_cust_order_legal_doc_controller extends wbController{
      * read
      * controler for get all items
      */
+	public static function imurl(){
+		return 'c://xampp/htdocs/mpd-wp/server/var/files/';
+	}
+	public static function unlinkurl(){
+		return '../../mpd-wp/server/var/files/';
+	}
     public static function read($args = array()){
         // Security check
         //if (!wbSecurity::check('DHotel')) return;
@@ -133,9 +139,15 @@ class t_cust_order_legal_doc_controller extends wbController{
 					$table->setRecord($items);
     	            $table->create();
     	            // insert detail
-                    
+    	            ///////////////////////////////////this is the magic for upload////////////////////////////////////
+					$encoded = $_POST['uploaded']->file_name;
+					$location = self::imurl().$items[$table->pkey].'_'.$items['file_name'];// Mention where to upload the file
+					$current = @file_get_contents($location);                     // Get the file content. This will create an empty file if the file does not exist     
+					$current = base64_decode($encoded);                          // Now decode the content which was sent by the client     
+					file_put_contents($location, $current);                      // Write the decoded content in the file mentioned at particular location
+					///////////////////////////////////////////////////////////////////////////////////////////////////
     	            
-    	            $data['success'] = true;
+					$data['success'] = true;
     	            $data['message'] = 'Data berhasil disimpan';
     	            $data['items'] = $table->get($items[$table->pkey]);
 	            // all ok, commit transaction
@@ -185,7 +197,7 @@ class t_cust_order_legal_doc_controller extends wbController{
         $table =& wbModule::getModel('bds', 't_cust_order_legal_doc');
         
         $table->actionType = 'UPDATE';
-        
+        $old_row = $table->Get($items['t_cust_order_legal_doc_id']);
         if (isset($items[0])){
         	$errors = array();
         	$numSaved = 0;
@@ -213,14 +225,35 @@ class t_cust_order_legal_doc_controller extends wbController{
 	        try{
 	            $table->setRecord($items);
 	            $table->update();
-
+				
+				$r = $old_row;
+				if (!empty($r['file_name']) && is_file(self::unlinkurl().$items['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+					@unlink(self::unlinkurl().$items['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+			
+					if (is_file(self::unlinkurl().'th_'.$items['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+						@unlink(self::unlinkurl().'th_'.$items['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+					}
+					if (is_file(self::unlinkurl().'view_'.$items['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+						@unlink(self::unlinkurl().'view_'.$items['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+					}
+					
+				}
+				
+				///////////////////////////////////this is the magic for upload////////////////////////////////////
+				$encoded = $_POST['uploaded']->file_name;
+				$location = self::imurl().$items[$table->pkey].'_'.$items['file_name'];// Mention where to upload the file
+				$current = @file_get_contents($location);                     // Get the file content. This will create an empty file if the file does not exist     
+				$current = base64_decode($encoded);                          // Now decode the content which was sent by the client     
+				file_put_contents($location, $current);                      // Write the decoded content in the file mentioned at particular location
+				///////////////////////////////////////////////////////////////////////////////////////////////////
+				
 	            $data['success'] = true;
 	            $data['message'] = 'Data berhasil di-update';
 	            
 	        }catch (Exception $e) {
 	            $data['message'] = $e->getMessage();
 	        }
-	        $data['items'] = array_merge($items, $table->record,array('old_row' => $table->Get($items['t_cust_order_legal_doc_id'])));
+	        $data['items'] = array_merge($items, $table->record,array('old_row' => $old_row));
         }
     
         return $data;    
@@ -242,26 +275,57 @@ class t_cust_order_legal_doc_controller extends wbController{
         
         $data = array('items' => array(), 'total' => 0, 'success' => false, 'message' => '');
     
-        $table =& wbModule::getModel('bds', 'cust_acc_trans');
+        $table =& wbModule::getModel('bds', 't_cust_order_legal_doc');
         
         try{
             $table->dbconn->BeginTrans();
                 if (is_array($items)){
                     foreach ($items as $key => $value){
                         if (empty($value)) throw new Exception('Empty parameter');
-                        
+                        $old_row = $table->Get($value);
+						$r = $old_row;
                         $table->remove($value);
-                        $data['items'][] = array($table->pkey => $value);
+						$return['deleted'] = array($table->pkey => $value);
+						$return['old_row'] = $old_row;
+						$data['items'][] = $return;
                         $data['total']++;
+						if (!empty($r['file_name']) && is_file(self::unlinkurl().$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+							@unlink(self::unlinkurl().$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+					
+							if (is_file(self::unlinkurl().'th_'.$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+								@unlink(self::unlinkurl().'th_'.$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+							}
+							if (is_file(self::unlinkurl().'view_'.$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+								@unlink(self::unlinkurl().'view_'.$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+							}
+							
+						}
                     }
                 }else{
                     $items = (int) $items;
                     if (empty($items)){
                         throw new Exception('Empty parameter');
                     }
-        
+					$old_row = $table->Get($items);
+					$r = $old_row;
                     $table->remove($items);
-                    $data['items'][] = array($table->pkey => $items);
+					
+					if (!empty($r['file_name']) && is_file(self::unlinkurl().$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+						@unlink(self::unlinkurl().$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+				
+						if (is_file(self::unlinkurl().'th_'.$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+							@unlink(self::unlinkurl().'th_'.$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+						}
+						if (is_file(self::unlinkurl().'view_'.$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
+							@unlink(self::unlinkurl().'view_'.$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+						}
+						
+					}
+					
+					
+					$data['items']['single'] = true;
+                    $data['items']['deleted'] = array($table->pkey => $items);
+					$data['items']['old_row'] = $old_row;
                     $data['total'] = 1;            
                 }
     

@@ -12,7 +12,7 @@ class t_cust_order_legal_doc_controller extends wbController{
      * controler for get all items
      */
 	public static function imurl(){
-		return 'c://xampp/htdocs/mpd-wp/server/var/files/';
+		return 'c://inetpub/wwwroot/mpd-wp/server/var/files/';
 	}
 	public static function unlinkurl(){
 		return '../../mpd-wp/server/var/files/';
@@ -308,7 +308,7 @@ class t_cust_order_legal_doc_controller extends wbController{
                     }
 					$old_row = $table->Get($items);
 					$r = $old_row;
-                    $table->remove($items);
+                    //$table->remove($items);
 					
 					if (!empty($r['file_name']) && is_file(self::unlinkurl().$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
 						@unlink(self::unlinkurl().$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name']);

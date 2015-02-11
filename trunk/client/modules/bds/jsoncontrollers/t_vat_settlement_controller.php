@@ -173,7 +173,6 @@ class t_vat_settlement_controller extends wbController{
 					'limit' => $limit);
 					
             $ws_data = self::getResultData($ws_client, $params);
-            
             $data['items'] = $ws_data ['data'];
             $data['total'] = $ws_data ['total'];
             $data['message'] = $ws_data ['message'];
@@ -256,22 +255,25 @@ class t_vat_settlement_controller extends wbController{
     	$size = $pdf->_getpagesize('Legal');
     	$pdf->DefPageSize = $size;
     	$pdf->CurPageSize = $size;
-        $pdf->AddPage('Landscape', array(160,241.3));
+        $pdf->AddPage('Landscape', array(160,210));
         $pdf->SetFont('helvetica', '', $_FONTSIZE);
     	$pdf->SetRightMargin(5);
-    	$pdf->SetLeftMargin(9);
+    	$pdf->SetLeftMargin(5);
 		$pdf->SetTopMargin(-20);
     	$pdf->SetAutoPageBreak(false,0);
 		
 		$pdf->Image('images/logo_pemda.png',12,15,20,20);
     
     	$pdf->SetFont('helvetica', 'B',14);
-    	$pdf->SetWidths(array(15,195));
+    	$pdf->SetWidths(array(10,165));
 		$pdf->SetAligns(array("C","C"));
     	$pdf->RowMultiBorderWithHeight(array("","PEMERINTAH KOTA BANDUNG\nDINAS PELAYANAN PAJAK"),array('',''),6);
 		$pdf->SetFont('helvetica', '',12);
+		$pdf->SetWidths(array(15,165));
+		$pdf->SetAligns(array("C","C"));
 		$pdf->RowMultiBorderWithHeight(array("","Jalan Wastukancana No.2\nTelp. 022-4235052 - Bandung"),array('',''),6);
-		$pdf->RowMultiBorderWithHeight(array("",$data['message']),array('B','B'),6);
+		$pdf->SetWidths(array(15,165,20));
+		$pdf->RowMultiBorderWithHeight(array("","",""),array('B','B','B'),6);
 		$pdf->ln(2);
 		
 		$pdf->SetFont('helvetica', '',12);
@@ -281,8 +283,8 @@ class t_vat_settlement_controller extends wbController{
     	$pdf->RowMultiBorderWithHeight(array("WAJIB PAJAK",":",$items['wp_name']),array('','',''),6);
 		
 		$pdf->SetAligns(array("L","L","L","C"));
-    	$pdf->SetWidths(array(40,4,80,100));
-		$pdf->RowMultiBorderWithHeight(array("NPWPD",":",$items['npwd'],"NO PEMBAYARAN"),array('','','','BLTR'),6);
+    	$pdf->SetWidths(array(40,4,80,70));
+		$pdf->RowMultiBorderWithHeight(array("NPWPD",":",$items['npwd'],"NOMOR PEMBAYARAN"),array('','','','BLTR'),6);
 		
 		$pdf->SetAligns(array("L","L","L"));
     	$pdf->SetWidths(array(40,4,80));
@@ -290,8 +292,8 @@ class t_vat_settlement_controller extends wbController{
 		$pdf->Cell(40, 6, 'JENIS PAJAK', "", 0, 'l');
 		$pdf->Cell(4, 6, ':', "", 0, 'L');
 		$pdf->Cell(80, 6, $items['vat_code'], "", 0, 'L');
-		$pdf->SetFont('helvetica', 'B',20);
-		$pdf->Cell(100, 15, $no_bayar, "BLTR", 0, 'C');
+		$pdf->SetFont('helvetica', 'B',26);
+		$pdf->Cell(70, 15, $no_bayar, "BLTR", 0, 'C');
 		$pdf->SetFont('helvetica', '',12);
 		$pdf->ln(6);
 		$pdf->RowMultiBorderWithHeight(array("MASA PAJAK",":",$items['code']),array('','',''),6);
@@ -307,19 +309,21 @@ class t_vat_settlement_controller extends wbController{
 		$pdf->RowMultiBorderWithHeight(array("TERBILANG",":",ucwords($items['dengan_huruf'].' rupiah')),array('','',''),6);
         //$pdf->RowMultiBorderWithHeight(array("BATAS WAKTU PEMBAYARAN",":",$items['items'][0]['pay_due_date']),array('','',''),6);
 		
-        $pdf->SetWidths(array(224));
+        $pdf->SetWidths(array(200));
 		$pdf->SetAligns(array("L"));
-        $pdf->SetFont('helvetica', '',11);
+        $pdf->SetFont('helvetica', '',10);
         $pdf->ln(6);
-        $pdf->RowMultiBorderWithHeight(array("*Denda pajak yang terterapada slip ini hanya berlaku pada tanggal ".$items['settlement_date']."."),
+        $pdf->RowMultiBorderWithHeight(array("*Nomor pembayaran dan denda pajak yang tertera pada slip ini hanya berlaku pada hari ini, tanggal ".$items['settlement_date']." sampai dengan pukul 23:59 WIB"),
 		array(''),6);
-		$pdf->RowMultiBorderWithHeight(array("**Keterlambatan pembayaran melewati tanggal jatuh tempo akan dikenakan denda sesuai administrasi berupa bunga sebesar 2% (dua persen) setiap bulannya."),
-		array(''),6);
+		//$pdf->RowMultiBorderWithHeight(array("**Keterlambatan pembayaran melewati tanggal jatuh tempo akan dikenakan denda sesuai administrasi berupa bunga sebesar 2% (dua persen) setiap bulannya."),
+		//array(''),6);
     	$pdf->ln(8);
+		$pdf->SetFont('helvetica', '',12);
 		$pdf->SetAligns(array("C"));
-		$pdf->RowMultiBorderWithHeight(array("Bandung, ".$items['settlement_date']."\nPukul ".$items['pukul']),array(''),6);
-		$pdf->RowMultiBorderWithHeight(array("\n\nBANDUNG JUARA"),array(''),6);
-		$pdf->Image('http://'.$_SERVER['HTTP_HOST'].'/mpd-wp/client/lib/qrcode/generate-qr.php?param='.$no_bayar.'',175,115,20,20,'PNG');
+		$pdf->RowMultiBorderWithHeight(array("Bandung, ".$items['settlement_date']." Pukul ".$items['pukul']),array(''),6);
+		$pdf->SetFont('helvetica', '',12);
+		$pdf->RowMultiBorderWithHeight(array("BAYAR PAJAK MUDAH BANDUNG JUARA"),array(''),6);
+		$pdf->Image('http://'.$_SERVER['HTTP_HOST'].'/mpd-wp/client/lib/qrcode/generate-qr.php?param='.$no_bayar.'',175,13,25,25,'PNG');
     	$pdf->Output(time()."_kwitansi_".$no_bayar,"I");
 		exit;
 		

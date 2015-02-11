@@ -31,8 +31,8 @@ body.login .page-header{
     /* MARGIN-TOP: -1%; */
     BOX-SHADOW: 0PX 0PX 60PX 0PX rgb(0, 139, 255);
     TEXT-SHADOW: 3PX 3PX 1PX rgb(162, 216, 223);
-	background: url("../images/logo_pemkot_bdg.png") no-repeat;
-	background-size: 172px 132px;
+	background: url("../images/logobdg.gif") no-repeat;
+	background-size: 138px 120px;
 	background-position: 14px 7px;
 }
 
@@ -40,7 +40,8 @@ body.login .page-header H1{
 	PADDING-TOP: 1%;
 	font-size: 47px;
     line-height: 58px;
-	color: #1B890F;
+	/*color: #1B890F; */
+	color: #00009F;
 }
 body.login .page-header .logo{
 	background: url("../images/logo-login.png") no-repeat;
@@ -81,7 +82,8 @@ body.login .page-body{
 
 .loginform-title {
 	margin-top:50px;
-	color:#1B890F;
+	/*color:#1B890F;*/
+	color:#0000EE;
 	font-size:30;
 }
 .loginform-content {
@@ -89,9 +91,9 @@ body.login .page-body{
 	padding-bottom:25px;
 	text-align: center;
 	box-shadow: 6px 6px 25px 15px rgb(21, 170, 205);
-	color:#1B890F;
+	color:#0000EE;
 	font-size:20;
-	border-radius: 10px;
+	border-radius: 8px;
 }
 
 .loginform-content input{

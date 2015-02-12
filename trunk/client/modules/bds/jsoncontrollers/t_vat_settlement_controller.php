@@ -262,7 +262,7 @@ class t_vat_settlement_controller extends wbController{
 		$pdf->SetTopMargin(-20);
     	$pdf->SetAutoPageBreak(false,0);
 		
-		$pdf->Image('images/logo_pemda.png',12,15,20,20);
+		$pdf->Image('images/logo_pemda_warna.png',12,15,20,20);
     
     	$pdf->SetFont('helvetica', 'B',14);
     	$pdf->SetWidths(array(10,165));
@@ -293,8 +293,10 @@ class t_vat_settlement_controller extends wbController{
 		$pdf->Cell(4, 6, ':', "", 0, 'L');
 		$pdf->Cell(80, 6, $items['vat_code'], "", 0, 'L');
 		$pdf->SetFont('helvetica', 'B',26);
+		$pdf->SetTextColor(255,0,0);
 		$pdf->Cell(70, 15, $no_bayar, "BLTR", 0, 'C');
 		$pdf->SetFont('helvetica', '',12);
+		$pdf->SetTextColor(0,0,0);
 		$pdf->ln(6);
 		$pdf->RowMultiBorderWithHeight(array("MASA PAJAK",":",$items['code']),array('','',''),6);
 		

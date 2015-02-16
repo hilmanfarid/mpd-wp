@@ -91,8 +91,6 @@ class t_cust_order_legal_doc_controller extends wbController{
 		    			'limit' => $limit);
 		    
             $ws_data = self::getResultData($ws_client, $params);  
-			print_r($ws_data);
-			exit;
 			$filename = $thumbnail = '';
     	    if($ws_data['success']){
 				try{        
@@ -182,14 +180,14 @@ class t_cust_order_legal_doc_controller extends wbController{
 				try{        
 					if (!empty($_FILES['file_name']['name'])){
 						$r = $ws_data['data']['old_row'];
-						if (!empty($r['file_name']) && is_file(self::imurl().$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-							@unlink(self::imurl().$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+						if (!empty($r['origin_file_name']) && is_file(self::imurl().$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name'])){ 
+							@unlink(self::imurl().$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name']);
 					
-							if (is_file(self::imurl().'th_'.$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-								@unlink(self::imurl().'th_'.$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+							if (is_file(self::imurl().'th_'.$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name'])){ 
+								@unlink(self::imurl().'th_'.$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name']);
 							}
-							if (is_file(self::imurl().'view_'.$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-								@unlink(self::imurl().'view_'.$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+							if (is_file(self::imurl().'view_'.$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name'])){ 
+								@unlink(self::imurl().'view_'.$ws_data ['data']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name']);
 							}
 							
 						}
@@ -254,14 +252,14 @@ class t_cust_order_legal_doc_controller extends wbController{
 			if($ws_data['data']['single']){
 				if($ws_data['success']){
 					$r = $ws_data['data']['old_row'];
-					if (!empty($r['file_name']) && is_file(self::imurl().$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-						@unlink(self::imurl().$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+					if (!empty($r['origin_file_name']) && is_file(self::imurl().$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name'])){ 
+						@unlink(self::imurl().$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name']);
 				
-						if (is_file(self::imurl().'th_'.$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-							@unlink(self::imurl().'th_'.$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+						if (is_file(self::imurl().'th_'.$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name'])){ 
+							@unlink(self::imurl().'th_'.$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name']);
 						}
-						if (is_file(self::imurl().'view_'.$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-							@unlink(self::imurl().'view_'.$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+						if (is_file(self::imurl().'view_'.$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name'])){ 
+							@unlink(self::imurl().'view_'.$ws_data ['data']['deleted']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name']);
 						}	
 					}
 				}
@@ -269,14 +267,14 @@ class t_cust_order_legal_doc_controller extends wbController{
 				if($ws_data['success']){
 					foreach($ws_data['data'] as $item){
 						$r = $item['old_row'];
-						if (!empty($r['file_name']) && is_file(self::imurl().$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-							@unlink(self::imurl().$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+						if (!empty($r['origin_file_name']) && is_file(self::imurl().$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name'])){ 
+							@unlink(self::imurl().$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name']);
 					
-							if (is_file(self::imurl().'th_'.$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-								@unlink(self::imurl().'th_'.$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+							if (is_file(self::imurl().'th_'.$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name'])){ 
+								@unlink(self::imurl().'th_'.$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name']);
 							}
-							if (is_file(self::imurl().'view_'.$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-								@unlink(self::imurl().'view_'.$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+							if (is_file(self::imurl().'view_'.$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name'])){ 
+								@unlink(self::imurl().'view_'.$item['deleted']['t_cust_order_legal_doc_id'].'_'.$r['origin_file_name']);
 							}	
 						}
 					}

@@ -12,7 +12,8 @@ class t_cust_order_legal_doc_controller extends wbController{
      * controler for get all items
      */
 	public static function imurl(){
-		return 'c://inetpub/wwwroot/mpd-wp/server/var/files/';
+		return 'c://xampp/htdocs/mpd-wp/server/var/files/';
+		//return 'c://inetpub/wwwroot/mpd-wp/server/var/files/';
 	}
 	public static function unlinkurl(){
 		return '../../mpd-wp/server/var/files/';
@@ -90,7 +91,7 @@ class t_cust_order_legal_doc_controller extends wbController{
 		$t_customer_order_id = wbRequest::getVarClean('t_customer_order_id', 'int', 0);
 		$p_legal_doc_type_id = wbRequest::getVarClean('p_legal_doc_type_id', 'str', '');
 		$legal_doc_desc = wbRequest::getVarClean('legal_doc_desc', 'str', '');
-		$origin_file_name = wbRequest::getVarClean('origin_file_name', 'str', '');
+		$origin_file_name = wbRequest::getVarClean('file_name', 'str', '');
 		$file_folder = wbRequest::getVarClean('file_folder', 'int',0);
 		$file_name = wbRequest::getVarClean('file_name', 'int', 0);
         $jsonItems = wbRequest::getVarClean('items', 'str', '');
@@ -136,6 +137,8 @@ class t_cust_order_legal_doc_controller extends wbController{
 	                // insert master
     	            $items[$table->pkey] = $table->dbconn->GetOne("select generate_id('sikp','t_cust_order_legal_doc','t_cust_order_legal_doc_id') from dual");
     	            $items['description']= $legal_doc_desc;
+					$items['origin_file_name'] = $items['file_name'];
+					$items['file_name'] = time().$items['file_name'];
 					$table->setRecord($items);
     	            $table->create();
     	            // insert detail
@@ -183,7 +186,7 @@ class t_cust_order_legal_doc_controller extends wbController{
 		$t_customer_order_id = wbRequest::getVarClean('t_customer_order_id', 'int', 0);
 		$p_legal_doc_type_id = wbRequest::getVarClean('p_legal_doc_type_id', 'str', '');
 		$legal_doc_desc = wbRequest::getVarClean('legal_doc_desc', 'str', '');
-		$origin_file_name = wbRequest::getVarClean('origin_file_name', 'str', '');
+		$origin_file_name = wbRequest::getVarClean('file_name', 'str', '');
 		$file_folder = wbRequest::getVarClean('file_folder', 'int',0);
 		$file_name = wbRequest::getVarClean('file_name', 'int', 0);
         $jsonItems = wbRequest::getVarClean('items', 'str', '');
@@ -223,20 +226,13 @@ class t_cust_order_legal_doc_controller extends wbController{
         	$data['items'] =$items;
         }else{
 	        try{
+				$items['file_name'] = time().$items['file_name'];
 	            $table->setRecord($items);
 	            $table->update();
 				
 				$r = $old_row;
 				if (!empty($r['file_name']) && is_file(self::unlinkurl().$items['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
 					@unlink(self::unlinkurl().$items['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
-			
-					if (is_file(self::unlinkurl().'th_'.$items['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-						@unlink(self::unlinkurl().'th_'.$items['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
-					}
-					if (is_file(self::unlinkurl().'view_'.$items['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-						@unlink(self::unlinkurl().'view_'.$items['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
-					}
-					
 				}
 				
 				///////////////////////////////////this is the magic for upload////////////////////////////////////

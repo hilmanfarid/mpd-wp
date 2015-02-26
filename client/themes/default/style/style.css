@@ -103,3 +103,38 @@ body.login .page-body{
 .errormsg{
     color:#FF0000;
 }
+
+
+
+
+body.login .page-body{
+    text-align: center;
+}
+
+.page-footer{
+
+}
+
+.clear {
+    clear:both;
+}
+
+/* lupapassword */
+
+.lupapassword {
+	
+	width: 450px;
+	height: 300px;
+	margin: 0px auto;
+	/*background: url("../images/login-box.png") no-repeat center;*/
+}
+.lupapassword-content {
+    padding-top:25px;
+	padding-bottom:25px;
+	padding-left:5px;	
+	padding-right:5px;	
+	box-shadow: 6px 6px 25px 15px rgb(21, 170, 205);
+	color:#0000EE;
+	font-size:20;
+	border-radius: 8px;
+}

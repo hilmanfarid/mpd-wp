@@ -383,6 +383,7 @@ class cust_acc_trans_controller extends wbController{
 
     }
     public static function uploadExcel($args = array()){
+        $temp_cust_account = self::getNpwd();
         global $_FILES;
     	try {
             //'excel_file' adalah nama field di form
@@ -393,7 +394,7 @@ class cust_acc_trans_controller extends wbController{
             echo $e->getMessage();
             exit;
         }
-    
+        
     	$file_name = $_FILES['excel_trans_cust']['name']; // <-- File Name
         $file_location = 'var/uploadexcel/'.$file_name; // <-- LOKASI Upload File
     
@@ -431,7 +432,7 @@ class cust_acc_trans_controller extends wbController{
     		 //while ($DBConnect->next_record()){
     		//	$value = $DBConnect->f("ty_lov_npwd");		 
     		// }
-    		 $t_cust_account_id = wbRequest::getVarClean('t_cust_account_id', 'int', 0);		
+    		 $t_cust_account_id = wbRequest::getVarClean('t_cust_account_id', 'int', $temp_cust_account['items'][0]['t_cust_account_id']);	
     		 //$i_t_cust_id = CCGetFromGet("t_cust_account_id","");
     		 //$i_t_cust_account_id = empty($i_t_cust_id) ? $value : $i_t_cust_id;
     
@@ -450,12 +451,11 @@ class cust_acc_trans_controller extends wbController{
                    $item['i_serve_charge'] =  $xl_reader->sheets[0]['cells'][$i][4];
                    //$i_vat_charge = $xl_reader->sheets[0]['cells'][$i][4];
     			   $item['i_vat_charge'] = "null";
-                   $item['i_desc'] = $xl_reader->sheets[0]['cells'][$i][5];                   
+                   $item['i_desc'] = $xl_reader->sheets[0]['cells'][$i][5];   
+                   $item['p_vat_type_dtl_id'] = $temp_cust_account['items'][0]['p_vat_type_dtl_id'];                
     		       $items[]=$item;
              } 
-             /*echo '<pre>';
-             print_r(json_encode($items));
-             exit;*/
+             $_POST['p_vat_type_dtl_id']=$temp_cust_account['items'][0]['p_vat_type_dtl_id'];
              $_POST['items']=json_encode($items);
              $data = self::create();
              echo json_encode($data);
@@ -464,6 +464,38 @@ class cust_acc_trans_controller extends wbController{
             echo $e->getMessage();
             exit;
         }
+    }
+    
+    public static function getCustAccMonth($args = array()){
+        // Security check
+        //if (!wbSecurity::check('cust_acc_trans')) return;
+
+        // Get arguments from argument array
+        //extract($args);
+
+        $data = array('items' => array(), 'total' => 0, 'success' => false, 'message' => '');
+
+        try{
+            $ws_client = self::getNusoap();
+		    $params = array('search' => '',
+					'getParams' => json_encode($_GET),
+					'controller' => json_encode(array('module' => 'bds','class' => 'cust_acc_trans', 'method' => 'getCustAccMonth', 'type' => 'json' )),
+					'postParams' => json_encode($_POST),
+					'jsonItems' => '',
+					'start' => $start,
+					'limit' => $limit);
+					
+            $ws_data = self::getResultData($ws_client, $params);
+           
+            $data['items'] = $ws_data ['data'];
+            $data['total'] = $ws_data ['total'];
+            $data['message'] = $ws_data ['message'];
+            $data['success'] = $ws_data ['success'];
+        }catch (Exception $e) {
+            $data['message'] = $e->getMessage();
+        }
+        return $data;
+
     }
 }
 ?>

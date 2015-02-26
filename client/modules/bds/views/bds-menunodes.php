@@ -1,5 +1,5 @@
 [
-    {"leaf":true,"id":"cust_acc_trans","text":"Transaksi Harian WP"},
+    {"leaf":true,"id":"cust_acc_month","text":"Transaksi Harian WP"},
     {"leaf":true,"id":"t_vat_settlement","text":"Pelaporan Pajak"},
 	{"leaf":true,"id":"t_trans_histories","text":"Histori Transaksi"},
 	{"leaf":true,"id":"transaction_info","text":"Informasi"},

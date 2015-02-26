@@ -108,7 +108,8 @@ class cust_acc_trans_controller extends wbController{
         $t_cust_account_id = wbRequest::getVarClean('t_cust_account_id', 'int', 0);
 		$trans_date = wbRequest::getVarClean('trans_date', 'str', '');
 		$p_vat_type_dtl_id = wbRequest::getVarClean('p_vat_type_dtl_id', 'int', 0);
-        
+        $start_period = wbRequest::getVarClean('start_period', 'str', '');
+        $end_period = wbRequest::getVarClean('end_period', 'str', '');
         $data = array('items' => array(), 'total' => 0, 'success' => false, 'message' => '');
         $dbConnParams_rwnet = array(
             'name' => wbConfig::get('DB.name_rwnet'),
@@ -142,6 +143,7 @@ class cust_acc_trans_controller extends wbController{
         		$table->setCriteria(" trunc(a.payment_date) <= '".$date_end."' ");
         	}*/
         	$table->setCriteria("p_vat_type_dtl_id = ?",array($p_vat_type_dtl_id));
+        	$table->setCriteria("trans_date between ? and ? ",array($start_period,$end_period));
         	$user_name = wbSession::getVar('user_name');
             //$table->setCriteria("t_cust_account_id IN(select t_cust_account_id from sikp.f_get_npwd_by_username('$user_name'))");
         	if(empty($trans_date)){
@@ -149,8 +151,10 @@ class cust_acc_trans_controller extends wbController{
         	}else{
         	    $trans_date = "'".$trans_date."'";
         	}
-        	$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no, service_desc, service_charge, vat_charge, description,p_vat_type_dtl_id
-                      from sikp.f_get_cust_acc_dtl_trans($t_cust_account_id,$trans_date)AS tbl (t_cust_acc_dtl_trans_id) ".$table->getCriteriaSQL()." ORDER BY $sort $dir";
+        	$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no, service_desc, service_charge, vat_charge, tbl.description,p_vat_type_dtl_id,p_finance_period_id
+                      from sikp.f_get_cust_acc_dtl_trans($t_cust_account_id,$trans_date)AS tbl (t_cust_acc_dtl_trans_id) 
+                      left join p_finance_period on p_finance_period.start_date <= trans_date and p_finance_period.end_date >= trans_date
+                      ".$table->getCriteriaSQL()." ORDER BY $sort $dir";
         	$items = $table->dbconn->GetAllAssocLimit($query,$limit,$start);
         	$query = '';
         	$query = "SELECT COUNT(1) from sikp.f_get_cust_acc_dtl_trans($t_cust_account_id,$trans_date) ".$table->getCriteriaSQL();
@@ -321,13 +325,13 @@ class cust_acc_trans_controller extends wbController{
             		    //$items[$i][$table->pkey] = $table->GenID();
             			$date_only = explode('T', $items[$i]["trans_date"]); 
             			$session = wbUser::getSession();
-            			$query = "SELECT COUNT(1) from sikp.f_get_cust_acc_dtl_trans(".$items[$i]["t_cust_account_id"].",'".$items[$i]["i_tgl_trans"]."') ".$table->getCriteriaSQL();
+            			/*$query = "SELECT COUNT(1) from sikp.f_get_cust_acc_dtl_trans(".$items[$i]["t_cust_account_id"].",'".$items[$i]["i_tgl_trans"]."') ".$table->getCriteriaSQL();
                         $countitems = $table->dbconn->GetOne($query);
                         if($countitems > 0){
                             $data['message'] = 'Data Transaksi Tanggal '.wbUtil::dateToString($items[$i]["i_tgl_trans"]). ' sudah ada';
         			        $data['success'] = false;
                             return $data;
-                        }
+                        }*/
         	            //$cust_id = $table->dbconn->GetOne("select t_cust_account_id".$session['user_id']);
                         $table->dbconn->Execute("select o_result_code, o_result_msg from \n" .
                         "f_ins_cust_acc_dtl_trans(" . $items[$i]["t_cust_account_id"]. ",\n" .
@@ -565,8 +569,8 @@ class cust_acc_trans_controller extends wbController{
         
         $sort = wbRequest::getVarClean('sort', 'str', 't_cust_account_id');
         $dir = wbRequest::getVarClean('dir', 'str', 'ASC');
-        $query = wbRequest::getVarClean('query', 'str', '');
-
+        //$query = wbRequest::getVarClean('query', 'str', '');
+		$s_keyword = wbRequest::getVarClean('query', 'str', '');
         $t_cust_account_id = wbRequest::getVarClean('t_cust_account_id', 'int', 0);
 		$trans_date = wbRequest::getVarClean('trans_date', 'str', '');
         
@@ -586,11 +590,93 @@ class cust_acc_trans_controller extends wbController{
         	$query = "select ty_lov_npwd as t_cust_account_id, npwd, company_name,
                         p_vat_type_id, vat_code, p_vat_type_dtl_id, vat_code_dtl
                         from f_get_npwd_by_username('$user_name') AS tbl (ty_lov_npwd)
-                        where upper(npwd) like '%$s_keyword%' OR
-                        upper(company_name) like '%$s_keyword%'";
+                        where upper(npwd) ILIKE '%$s_keyword%' OR
+                        upper(company_name) ILIKE '%$s_keyword%'";
             
         	$items = $table->dbconn->GetAllAssocLimit($query,$limit,$start);
         	$query = "SELECT COUNT(1) from sikp.f_get_cust_acc_dtl_trans($t_cust_account_id,'$trans_date') ".$table->getCriteriaSQL();
+            $countitems = $table->dbconn->GetOne($query);
+            if ($countitems === false){
+                throw new Exception($dbConn_rwnet->ErrorMsg());
+            }
+            //$total = $table->countAll();
+        }catch(UserLoginFailedException $e){
+            $data['message'] = $e->getMessage();
+        }
+        $data['items'] = $items;
+        $data['total'] = $countitems;
+        $data['success'] = true;
+        return $data;
+       
+    }
+    public static function getCustAccMonth($args = array()){
+        
+        extract($args);
+    
+        $start = wbRequest::getVarClean('start', 'int', 0);
+        $limit = wbRequest::getVarClean('limit', 'int', 50);
+        
+        $sort = wbRequest::getVarClean('sort', 'str', 't_cust_account_id');
+        $dir = wbRequest::getVarClean('dir', 'str', 'ASC');
+        //$query = wbRequest::getVarClean('query', 'str', '');
+		$s_keyword = wbRequest::getVarClean('query', 'str', '');
+        $t_cust_account_id = wbRequest::getVarClean('t_cust_account_id', 'int', 0);
+		$trans_date = wbRequest::getVarClean('trans_date', 'str', '');
+        
+        $data = array('items' => array(), 'total' => 0, 'success' => false, 'message' => '');
+        $dbConnParams_rwnet = array(
+            'name' => wbConfig::get('DB.name_rwnet'),
+            'user' => wbConfig::get('DB.user_rwnet'),
+            'password' => wbConfig::get('DB.password_rwnet'),
+            'host' => wbConfig::get('DB.host_rwnet'),
+            'type' => wbConfig::get('DB.type_rwnet'),
+            'schema' => 'sikp'
+        );
+        
+        try{
+        	$table =& wbModule::getModel('bds', 'd_hotel');
+        	$user_name = wbSession::getVar('user_name');
+        	$arr_npwd = array();
+        	if(empty($t_cust_account_id))$arr_npwd = $table->dbconn->GetItem("select t_cust_account_id,npwd from sikp.f_get_npwd_by_username('$user_name')");
+        	$query = " SELECT
+                        		 '".$arr_npwd['npwd']."' as npwd,
+                        		 t_cust_acc_dtl_trans.t_cust_account_id,
+                        		 sum(t_cust_acc_dtl_trans.service_charge) as jum_trans,
+                        		 sum(t_cust_acc_dtl_trans.vat_charge) as jum_pajak,
+                                 t_cust_acc_dtl_trans.p_vat_type_dtl_id,
+                        		 p_finance_period.p_finance_period_id,
+                        		 p_finance_period.code,
+                        		 t_customer_order.p_order_status_id,
+                        		 case when t_vat_setllement.start_period is null then p_finance_period.start_date else t_vat_setllement.start_period END as start_period,
+                             case when t_vat_setllement.end_period is null then p_finance_period.end_date else t_vat_setllement.end_period END as end_period
+                        FROM
+                             t_cust_acc_dtl_trans
+                        LEFT JOIN p_finance_period on to_char(trans_date, 'YYYY-MM') = to_char(p_finance_period.start_date, 'YYYY-MM')
+                        LEFT JOIN t_vat_setllement on t_cust_acc_dtl_trans.t_cust_account_id = t_vat_setllement.t_cust_account_id and  p_finance_period.p_finance_period_id = t_vat_setllement.p_finance_period_id 
+                        LEFT JOIN t_customer_order on t_customer_order.t_customer_order_id = t_vat_setllement.t_customer_order_id
+                        WHERE
+                             t_cust_acc_dtl_trans.t_cust_account_id = ".$arr_npwd['t_cust_account_id']." AND 
+                        		 trans_date >= CASE
+                        				WHEN  t_vat_setllement.start_period is null THEN p_finance_period.start_date
+                        				ELSE t_vat_setllement.start_period
+                        			END
+                        		AND 
+                        		trans_date <= CASE
+                        				WHEN  t_vat_setllement.end_period is null THEN p_finance_period.end_date
+                        				ELSE t_vat_setllement.end_period
+                        			END
+                        GROUP BY
+                        		 t_cust_acc_dtl_trans.t_cust_account_id,
+                                 t_cust_acc_dtl_trans.p_vat_type_dtl_id,
+                        		 p_finance_period.p_finance_period_id,
+                        		 p_finance_period.code,
+                        		 t_customer_order.p_order_status_id,
+                        		 case when t_vat_setllement.start_period is null then p_finance_period.start_date else t_vat_setllement.start_period END,
+                             case when t_vat_setllement.end_period is null then p_finance_period.end_date else t_vat_setllement.end_period END
+                        ORDER BY 
+                        		 case when t_vat_setllement.start_period is null then p_finance_period.start_date else t_vat_setllement.start_period END DESC";
+        	$items = $table->dbconn->GetAllAssocLimit($query,$limit,$start);
+        	$query = "SELECT COUNT(1) from (".$query.") tbl";
             $countitems = $table->dbconn->GetOne($query);
             if ($countitems === false){
                 throw new Exception($dbConn_rwnet->ErrorMsg());

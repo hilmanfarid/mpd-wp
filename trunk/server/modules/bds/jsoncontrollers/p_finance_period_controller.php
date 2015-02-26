@@ -52,7 +52,7 @@ class p_finance_period_controller extends wbController{
 
             $user_name = wbSession::getVar('user_name');
             //$table->setCriteria("finance.p_finance_period_id not in(select p_finance_period_id from t_vat_setllement where npwd='".$user_name."')");
-            $table->setCriteria("finance.start_date <= sysdate");
+            //$table->setCriteria("finance.start_date <= sysdate");
 			$items = $table->getAll($start, $limit, $sort, $dir);
             $total = $table->countAll();
         

@@ -32,10 +32,12 @@ endif;
 		    	<label for="password" style="font-weight:bold;">Password </label>
 		  	</strong><br/>
 		  	<input type="password" name="password" id="password" maxlength="64" size="22" tabindex="2" /><br />
-		  	<input type="submit" value="Login" tabindex="3" />
+		  	<input type="submit" value="Login" tabindex="3" /><br/><br/>
+			<a href="index.php?module=bds&class=helper&method=lupa_password" style="font-size:12; font-weight:bold;">Lupa Password</a>
 		</div>
 	</div>
 </form>
+<br/><br/>
 <center>
 	Copyright &copy; 2012
 </center>

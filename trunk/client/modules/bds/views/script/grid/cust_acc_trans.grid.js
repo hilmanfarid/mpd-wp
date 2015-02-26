@@ -9,7 +9,7 @@ Bds.grid.cust_acc_trans = Ext.extend(Webi.grid.GridPanel, {
     viewConfig:{forceFit:false},
     initComponent : function() {
         this.store = new Bds.store.cust_acc_trans();
-        this.simpleform = new Ext.FormPanel({
+        /*this.simpleform = new Ext.FormPanel({
 		    fileUpload: true,
             labelWidth: 75, // label settings here cascade unless overridden
             url:'save-form.php',
@@ -43,7 +43,7 @@ Bds.grid.cust_acc_trans = Ext.extend(Webi.grid.GridPanel, {
             },{
                 text: 'Cancel'
             }]
-        });
+        });*/
         this.columns = [
             {header: 'NPWPD', hidden: false, sortable: true, dataIndex: 'npwd', width: 112},
             //{header: 'trans_date',hidden: false, sortable: true, dataIndex: 'trans_date', width: 112,renderer: Webi.format.dateRenderer},
@@ -195,7 +195,7 @@ Bds.grid.cust_acc_trans = Ext.extend(Webi.grid.GridPanel, {
                 this.registration_no,
                 this.njop_pbb,
                 this.wp_name,*/
-                this.simpleform
+                //this.simpleform
             ]
         });
 		this.filter=new Ext.Button({
@@ -258,7 +258,7 @@ Bds.grid.cust_acc_trans = Ext.extend(Webi.grid.GridPanel, {
         }
     },
     onSubmit : function(){
-        this.simpleform.getForm().findField('form_t_cust_acc_id').setValue(Ext.getCmp('the-npwd').getValue());
+        /*this.simpleform.getForm().findField('form_t_cust_acc_id').setValue(Ext.getCmp('the-npwd').getValue());
         this.simpleform.getForm().findField('form_p_vat_type_dtl_id').setValue(Ext.getCmp('the-type_dtl').getValue());
         var thisgrid = this;
         this.simpleform.getForm().submit({
@@ -287,7 +287,7 @@ Bds.grid.cust_acc_trans = Ext.extend(Webi.grid.GridPanel, {
                 }else{
                     this.win.hide();
                     this.grid.store.reload();
-                }*/
+                }
             },
             failure: function(form, action) {
                 //this.hideActionProgress(action.result.type, false);
@@ -305,7 +305,7 @@ Bds.grid.cust_acc_trans = Ext.extend(Webi.grid.GridPanel, {
                 this.store.load();
             },
             scope: this
-	     });
+	     });*/
     }
 });
 Ext.reg('grid_cust_acc_trans', Bds.grid.cust_acc_trans);

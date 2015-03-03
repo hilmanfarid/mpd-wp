@@ -272,6 +272,7 @@ class user_controller extends wbController{
         extract($args);
     
         $sessionInfo = wbUser::getSession();
+		//print_r($sessionInfo);exit;
         $uid = $sessionInfo['user_id'];
 
         $data = array('items' => array(), 'success' => false, 'message' => '');
@@ -282,8 +283,16 @@ class user_controller extends wbController{
             }
             
             $table =& wbModule::getModel('base', 'roles.user');
-
-            $data['items'] = $table->get($uid);
+			$sql = "select b.p_app_user_id as user_id, b.user_name, 
+				a.wp_email as user_email, a.wp_name as user_realname, c.code as user_status,".$sessionInfo['roles'][0]['role_id']." as role_id,'".$sessionInfo['roles'][0]['role_name']."' as role_name
+				from t_cust_account a
+				left join t_customer_user b on a.t_customer_id = b.t_customer_id
+				left join p_account_status c on c.p_account_status_id = a.p_account_status_id
+				where b.p_app_user_id = ".$uid;
+			
+			$data ['items']=$table->dbconn->GetItem($sql);
+			//print_r($sql);exit;
+            //$data['items'] = $table->get($uid);
             $data['success'] = true;
         }catch (Exception $e) {
             $data['message'] = $e->getMessage();

@@ -37,12 +37,12 @@ class helper_controller extends wbController{
         return $data;    
     }
 	
-	public static function cek_jawaban($args = array()){
+	public static function cek_jawaban(){
         // Security check
         //if (!wbSecurity::check('t_vat_settlement')) return;
         
         // Get arguments from argument array
-        extract($args);
+       // extract($args);
 		
 		$email = wbRequest::getVarClean('email', 'str', '');
 		$npwpd = wbRequest::getVarClean('npwpd', 'str', '');
@@ -55,22 +55,39 @@ class helper_controller extends wbController{
         try{
             $table =& wbModule::getModel('bds', 't_vat_settlement');
 			
-            $query = "select c.t_customer_user_id, c.user_name, c.user_pwd , a.npwpd, a.p_private_question_id, a.private_answer from t_vat_registration as a
+            $query = "select c.t_customer_user_id, c.user_name, c.user_pwd , a.npwpd, a.p_private_question_id, a.private_answer,b.wp_email as email,b.t_cust_account_id from t_vat_registration as a
 				inner join t_cust_account as b on a.t_vat_registration_id = b.t_vat_registration_id
 				inner join t_customer_user as c on b.t_customer_id = c.t_customer_id
 				where c.user_name = '".$user_name."' and upper(a.npwpd) = upper('".$npwpd."') and a.p_private_question_id = ".$question." and upper(a.private_answer) =upper('".$answer."')";
-			$items = $table->dbconn->GetAll($query);
+			$items = $table->dbconn->GetItem($query);
 			
-		
-            $data['items'] = $items;
-            $data['total'] = count($items);
-            $data['success'] = true;
-			$data['message'] =  'test';
+			$data['items'] = $items;
+			$data['total'] = count($items);
+						
+			//cek email
+			if ($data['total'] >0){
+				if (empty($items['email']) and !empty($items['t_cust_account_id'])){
+					//update email wp
+					$query = "update t_cust_account set wp_email = '".$email."' where t_cust_account_id = ".$items['t_cust_account_id'];
+					$table->dbconn->Execute($query);	
+					
+					$data['success'] = true;
+					$data['message'] =  'Email belum ada,update email wp,proses dilanjutkan';
+				}else{
+					if ($items['email']==$email){
+						$data['success'] = true;
+						$data['message'] =  'Email sudah ada,email cocok,proses dilanjutkan';
+					}else{
+						$data['success'] = false;
+						$data['message'] =  'email tidak cocok,proses dibatalkan';
+					}
+				}			
+			}
         }catch (Exception $e) {
             $data['message'] = $e->getMessage();
         }
     
-        return $data;    
+        return $data;   
     }
 
 	public static function ganti_password($args = array()){
@@ -96,7 +113,7 @@ class helper_controller extends wbController{
             $query = "update p_app_user set user_pwd = md5('".$new_password."') where app_user_name = '".$user_name."'";
 			$table->dbconn->Execute($query);
 			$query = "update t_customer_user set user_pwd = md5('".$new_password."') where user_name = '".$user_name."'";
-			$table->dbconn->Execute($query);			
+			$table->dbconn->Execute($query);	
 			
             $data['items'] = '';
             $data['total'] = '';

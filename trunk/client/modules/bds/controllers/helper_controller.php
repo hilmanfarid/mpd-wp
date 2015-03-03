@@ -88,12 +88,13 @@ class helper_controller extends wbController{
         }catch (Exception $e) {
             $data2['message'] = $e->getMessage();
         }
-		$items = $data['items'] ;
-		if($data2['total']>0){
+		$items = $data2['items'] ;
+		
+		if( $data2['total'] > 0 and $data2['success']){
 			/* Ganti Password*/
 			try{
 				$ws_client = self::getNusoap();
-				$data2 = array();
+				$data3 = array();
 				$params = array('search' => '',
 						'getParams' => json_encode($_GET),
 						'controller' => json_encode(array('module' => 'bds','class' => 'helper', 'method' => 'ganti_password', 'type' => 'json' )),
@@ -104,21 +105,21 @@ class helper_controller extends wbController{
 						
 				$ws_data = self::getResultData($ws_client, $params);
 
-				$data2['items'] = $ws_data['data'];
-				$data2['total'] = $ws_data['total'];
-				$data2['message'] = $ws_data['message'];
-				$data2['success'] = $ws_data['success'];
+				$data3['items'] = $ws_data['data'];
+				$data3['total'] = $ws_data['total'];
+				$data3['message'] = $ws_data['message'];
+				$data3['success'] = $ws_data['success'];
 			}catch (Exception $e) {
-				$data2['message'] = $e->getMessage();
+				$data3['message'] = $e->getMessage();
 			}
 			
 			/* Kirim Email */
-			$new_password = $data2['message'];
+			$new_password = $data3['message'];
 			$respons = file_get_contents('http://202.154.24.3:81/mpd/send_email_forgot_password.php?receiver='.$email.'&username='.$user_name.'&password='.$new_password);
 			
 
 			wbResponse::Redirect(wbModule::url('bds', 'helper', 'lupa_password', 
-                                               array('errorMsg' => 'Password Berhasil Diubah')));
+											   array('errorMsg' => 'Password Berhasil Diubah. Silahkan cek email Anda untuk mengetahui password terbaru Anda.')));
 		}else{
 			wbResponse::Redirect(wbModule::url('bds', 'helper', 'lupa_password', 
                                                array('email' => $email,
@@ -127,7 +128,7 @@ class helper_controller extends wbController{
 													 'question' => $question, 
 													 'answer' => $answer,
 													 'hasil_query' => $items,
-													 'errorMsg' => 'Data yang cocok tidak ditemukan.')));
+													 'errorMsg' => 'Data yang cocok tidak ditemukan.'.$data2['message'])));
 		}
 		
 		

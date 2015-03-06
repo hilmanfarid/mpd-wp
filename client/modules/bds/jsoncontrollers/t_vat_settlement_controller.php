@@ -301,7 +301,7 @@ class t_vat_settlement_controller extends wbController{
 		$pdf->RowMultiBorderWithHeight(array("MASA PAJAK",":",$items['code']),array('','',''),6);
 		
 		$pdf->SetAligns(array("L","L","R"));
-		$pdf->SetWidths(array(40,4,30));
+		$pdf->SetWidths(array(40,4,40));
 		$pdf->RowMultiBorderWithHeight(array("JUMLAH (Rp)",":",number_format($items['total_vat_amount'],2,",",".")),array('','',''),6);
 		$pdf->RowMultiBorderWithHeight(array("DENDA (Rp)",":",number_format($items['total_penalty_amount'],2,",",".")),array('','',''),6);
 		$pdf->RowMultiBorderWithHeight(array("TOTAL (Rp)",":",number_format($items['total_bayar'],2,",",".")),array('','',''),6);

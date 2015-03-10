@@ -12,7 +12,7 @@ Bds.combo.p_finance_period = Ext.extend(Ext.form.ComboBox, {
     valueField: 'p_finance_period_id',
     typeAhead: false,
     loadingText: 'Searching...',
-    pageSize:50,
+    pageSize:10,
     minChars: 2,
     triggerAction: 'all',
     lazyRender: true,    

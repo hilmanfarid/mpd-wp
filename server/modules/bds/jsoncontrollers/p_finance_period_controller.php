@@ -20,7 +20,6 @@ class p_finance_period_controller extends wbController{
     
         $start = wbRequest::getVarClean('start', 'int', 0);
         $limit = wbRequest::getVarClean('limit', 'int', 10);
-        $limit = 10;
         $sort = wbRequest::getVarClean('sort', 'str', 'finance.start_date');
         $dir = wbRequest::getVarClean('dir', 'str', 'DESC');
         $query = wbRequest::getVarClean('query', 'str', '');

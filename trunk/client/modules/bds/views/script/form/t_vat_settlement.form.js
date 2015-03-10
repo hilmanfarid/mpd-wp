@@ -84,6 +84,10 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
                 this.fields.p_vat_type_dtl_cls_id.hide();
             }
         },this);
+		this.fields.p_vat_type_dtl_cls_id.on('select',function(cb,rec,index){
+            this.fields.percentage.setValue(rec.get('vat_pct'));  
+			this.hitungPajak();
+        },this);
         this.fields.total_trans_amount = new Ext.ux.NumericField({useThousandSeparator: true,enableKeyEvents:true,decimalPrecision:2,fieldLabel: 'Nilai Omzet',allowNegative:false, name: 'total_trans_amount', allowBlank: true,width:220});
 		this.fields.total_trans_amount.on('keyup',function(form,e){
             this.hitungPajak();

@@ -52,6 +52,8 @@ class t_vat_settlement_controller extends wbController{
             $table->setCriteria("settlement.t_cust_account_id = ?",array($t_cust_account_id));
             $table->setCriteria("settlement.p_settlement_type_id not in(?,?)",array(4,7));
             $table->setCriteria("cust_order.p_order_status_id = 1");
+			$table->setCriteria("settlement.payment_key is not null");
+			$table->setCriteria("settlement.payment_key <> ''");
             if(!empty($payment_key)){
                 $table->setCriteria("settlement.payment_key = ?",array($payment_key));
             }

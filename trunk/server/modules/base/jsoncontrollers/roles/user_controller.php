@@ -323,19 +323,19 @@ class user_controller extends wbController{
                 throw new Exception('Bad Params : Empty UserID');
             }
             	        
-	        $table =& wbModule::getModel('base', 'roles.user');
+	        $table =& wbModule::getModel('base', 'roles.p_app_user');
 	        $table->actionType = 'UPDATE';
 
-	        $record = array('user_id' => $uid, 
-	                        'user_email' => $user_email,
-	                        'user_realname' => $user_realname);
+	        $record = array('p_app_user_id' => $uid, 
+	                        'email_address' => $user_email,
+	                        'full_name' => $user_realname);
             
             if (!empty($user_password1)){
                 if (strcmp($user_password1, $user_password2) != 0) throw new Exception("Password tidak sama. Mohon periksa kembali");
                 
                 if (strlen($user_password1) < 5) throw new Exception("Panjang password minimal 5 karakter");
                 
-                $record['user_password'] = $user_password1;
+                $record['user_pwd'] = $user_password1;
 	        }
 	        
 	        $table->setRecord($record );

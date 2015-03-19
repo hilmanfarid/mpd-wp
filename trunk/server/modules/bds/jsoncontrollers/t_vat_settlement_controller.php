@@ -50,7 +50,7 @@ class t_vat_settlement_controller extends wbController{
             //$user_name = wbSession::getVar('user_name');
             //$table->setCriteria("npwd = (select t_cust_account_id from sikp.f_get_npwd_by_username('$user_name'))");
             $table->setCriteria("settlement.t_cust_account_id = ?",array($t_cust_account_id));
-            $table->setCriteria("settlement.p_settlement_type_id not in(?,?)",array(4,7));
+            $table->setCriteria("settlement.p_settlement_type_id = 1");
             $table->setCriteria("cust_order.p_order_status_id = 1");
 			$table->setCriteria("settlement.payment_key is not null");
 			$table->setCriteria("settlement.payment_key <> ''");

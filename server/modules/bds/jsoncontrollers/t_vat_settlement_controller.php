@@ -314,7 +314,7 @@ class t_vat_settlement_controller extends wbController{
             }
             $sql = "select o_mess,o_pay_key from f_vat_settlement_manual_wp(".$item['t_cust_account_id'].",".$item['finance_period'].",'".$item['npwd']."','".$item['start_period']."','".$item['end_period']."',null,".$item['total_trans_amount'].",".$item['total_vat_amount'].",".$item['p_vat_type_dtl_id'].",".$item['p_vat_type_dtl_cls_id'].", '".$user_name."')";
             $message = $table->dbconn->GetAll($sql);
-            $sql = "select * from f_get_penalty_amt(".$item['total_vat_amount'].",".$item['finance_period'].",".$item['finance_period'].");";
+            $sql = "select * from f_get_penalty_amt(".$item['total_vat_amount'].",".$item['finance_period'].",".$item['p_vat_type_dtl_id'].");";
             $penalty = $table->dbconn->GetOne($sql);
             $message[0]['penalty']=$penalty;
             if($message[0]['o_pay_key'] == null ||empty($message[0]['o_pay_key'])){

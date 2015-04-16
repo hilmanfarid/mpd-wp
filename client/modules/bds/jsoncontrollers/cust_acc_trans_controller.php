@@ -465,6 +465,77 @@ class cust_acc_trans_controller extends wbController{
             exit;
         }
     }
+	public static function uploadExcelLocal($args = array()){
+        global $_FILES;
+    	try {
+            //'excel_file' adalah nama field di form
+            if(empty($_FILES['excel_trans_cust']['name'])){
+                throw new Exception('File tidak boleh kosong');
+            }
+        }catch (Exception $e) {
+            echo $e->getMessage();
+            exit;
+        }
+        
+    	$file_name = $_FILES['excel_trans_cust']['name']; // <-- File Name
+        $file_location = 'var/uploadexcel/'.$file_name; // <-- LOKASI Upload File
+    
+    	//upload file ke lokasi tertentu
+        try {
+            if (!move_uploaded_file($_FILES['excel_trans_cust']['tmp_name'], $file_location)){
+                throw new Exception("Upload file gagal");
+            }
+        }catch(Exception $e) {
+            echo $e->getMessage();
+            exit;
+        }
+    	
+    	include('lib/excel/reader.php');
+        $xl_reader = new Spreadsheet_Excel_Reader();
+    	$res = $xl_reader->_ole->read($file_location);
+    
+        if($res === false) {
+        	if($xl_reader->_ole->error == 1) {
+        		echo "File Harus Format Excel";
+                exit;
+        	}
+        }
+    	
+    	
+    	try{
+    	     $xl_reader->read($file_location);
+             $firstColumn = $xl_reader->sheets[0]['cells'][1][1];
+    
+             		 
+    		// $DBConnect = new clsDBConnSIKP();  		
+    		 $session = wbUser::getSession();
+    		 $t_cust_account_id = wbRequest::getVarClean('t_cust_account_id', 'int',0);	
+			 $p_vat_type_dtl_id = wbRequest::getVarClean('p_vat_type_dtl_id', 'int',0);	
+    		 $items= array();	
+             for($i = 2; $i <= $xl_reader->sheets[0]['numRows']; $i++) {
+				   if(empty($xl_reader->sheets[0]['cells'][$i][1]));
+				   continue;
+    			   $item['t_cust_account_id'] = $t_cust_account_id; 
+    			   $item['i_tgl_trans'] =  $xl_reader->sheets[0]['cells'][$i][1]; 	
+                   $item['i_bill_no'] =  $xl_reader->sheets[0]['cells'][$i][2];
+                   $item['i_serve_desc'] =  $xl_reader->sheets[0]['cells'][$i][3];
+                   $item['i_serve_charge'] =  $xl_reader->sheets[0]['cells'][$i][4];
+                   //$i_vat_charge = $xl_reader->sheets[0]['cells'][$i][4];
+    			   $item['i_vat_charge'] = "null";
+                   $item['i_desc'] = $xl_reader->sheets[0]['cells'][$i][5];   
+                   $item['p_vat_type_dtl_id'] = $temp_cust_account['items'][0]['p_vat_type_dtl_id'];                
+    		       $items[]=$item;
+             } 
+             $_POST['items']=json_encode($items);
+			 $_POST['_LOCAL_ONLY']=true;
+             $data = self::create();
+             echo json_encode($data);
+             exit;
+        } catch(Exception $e) {
+            echo $e->getMessage();
+            exit;
+        }
+    }
     
     public static function getCustAccMonth($args = array()){
         // Security check

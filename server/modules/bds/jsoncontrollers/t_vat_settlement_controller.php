@@ -352,6 +352,7 @@ class t_vat_settlement_controller extends wbController{
                     $message=$table->dbconn->GetOne($sql);
                     if($message=='OK'){
                         $sql="select f_gen_vat_dtl_trans(".$items['t_vat_setllement_id'].",'".$user_name."')";   
+						$message=$table->dbconn->GetItem($sql);
                     }
                     $data['success'] = true;
                 }

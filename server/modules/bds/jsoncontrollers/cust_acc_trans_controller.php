@@ -295,6 +295,9 @@ class cust_acc_trans_controller extends wbController{
 	
 	public static function create($args = array()){
         // Security check
+		if($_POST['_LOCAL_ONLY']){
+			return self::createLocal();
+		}
         if (!wbSecurity::check('t_cust_account')) return;
 
         // Get arguments from argument array
@@ -417,7 +420,125 @@ class cust_acc_trans_controller extends wbController{
     
         return $data;    
     }
+	
+	public static function createLocal($args = array()){
+        // Security check
+        // Get arguments from argument array
+        extract($args);
+        
+        $data = array('items' => array(), 'success' => false, 'message' => '');
+        
+        $jsonItems = wbRequest::getVarClean('items', 'str', '');
+        
+        $items =& wbUtil::jsonDecode($jsonItems);
+        $t_cust_account_id = wbRequest::getVarClean('t_cust_account_id', 'int', 0);
+        $p_vat_type_dtl_id = wbRequest::getVarClean('p_vat_type_dtl_id', 'int', 0);
+		$user_name = wbRequest::getVarClean('user_name', 'str', '');
+        if (!is_array($items)){
+            $data['message'] = 'Invalid items parameter';
+            return $data;
+        }
+        $table =& wbModule::getModel('bds', 'cust_acc_trans');
+        $table->actionType = 'CREATE';
+        if (isset($items[0])){
+        	$errors = array();
+        	$numSaved = 0;
+        	$numItems = count($items);
+        	$savedItems = array();
+        	for($i=0; $i < $numItems; $i++){
+        		try{
+        		    
+        		    $table->dbconn->BeginTrans();
+            		    //$items[$i][$table->pkey] = $table->GenID();
+            			$date_only = explode('T', $items[$i]["trans_date"]); 
 
+                        $table->dbconn->Execute("select o_result_code, o_result_msg from \n" .
+                        "f_ins_cust_acc_dtl_trans(" . $items[$i]["t_cust_account_id"]. ",\n" .
+                        "                         '" . $items[$i]["i_tgl_trans"]. "',\n" .
+                        "                         '" . $items[$i]["i_bill_no"]. "',\n" .
+                        "                         '" . $items[$i]["i_serve_desc"]. "',\n" .
+                        "                         " . $items[$i]["i_serve_charge"]. ",\n" .
+                        "                         null,\n" .
+                        "                         '" . $items[$i]["i_description"]. "',\n" .
+                        "                         '" . $user_name. "',\n" .
+                        "                         '" . $p_vat_type_dtl_id. "',\n" .
+                        "                         null)");
+                	    $numSaved++;
+                	    /*$querystring = "select o_result_code, o_result_msg from \n" .
+                        "f_ins_cust_acc_dtl_trans(" . $items[$i]["t_cust_account_id"]. ",\n" .
+                        "                         '" . $items[$i]["i_tgl_trans"]. "',\n" .
+                        "                         '" . $items[$i]["i_bill_no"]. "',\n" .
+                        "                         '" . $items[$i]["i_serve_desc"]. "',\n" .
+                        "                         " . $items[$i]["i_serve_charge"]. ",\n" .
+                        "                         null,\n" .
+                        "                         '" . $items[$i]["i_description"]. "',\n" .
+                        "                         '" . $user_name. "',\n" .
+                        "                         '" . $p_vat_type_dtl_id. "',\n" .
+                        "                         null)";
+						$data['items']=$querystring;
+						return $data;*/
+        			$table->dbconn->CommitTrans();
+        		}catch(Exception $e){
+        		    $table->dbconn->RollbackTrans();
+        			$errors[] = $e->getMessage();
+        			$data['message'] = $e->getMessage();
+        			$data['success'] = false;
+        		//$items[$i] = array_merge($items[$i], $table->record);
+        	    }
+        	}
+        	$numErrors = count($errors);
+        	if (count($errors)){
+        		$data['message'] = $numErrors." dari ".$numItems." record gagal disimpan.<br/><br/><b>System Response:</b><br/>- ".implode("<br/>- ", $errors)."";
+        	}else{
+        		$data['success'] = true;
+        		$data['message'] = 'Data berhasil disimpan';
+        	}
+        	$data['items'] =$items;
+        }else{
+	        try{
+	            // begin transaction block
+	            $table->dbconn->BeginTrans();
+	                // insert master
+    	            //$items[$table->pkey] = $table->GenID();
+    	            /*$table->setRecord($items);
+    	            $table->create();
+    	            // insert */
+    	            $session = wbUser::getSession();
+    	            $date_only = explode('T', $items["trans_date"]); 
+    	            //$cust_id = $table->dbconn->GetOne("select t_cust_account_id".$session['user_id']);
+                    $table->dbconn->Execute("select o_result_code, o_result_msg from \n" .
+                    "f_ins_cust_acc_dtl_trans(" . $items["t_cust_account_id"]. ",\n" .
+                    "                         '" . $date_only[0]. "',\n" .
+                    "                         '" . $items["bill_no"]. "',\n" .
+                    "                         null,\n" .
+                    "                         " . $items["service_charge"]. ",\n" .
+                    "                         null,\n" .
+                    "                         '" . $items["description"]. "',\n" .
+                    "                         '" . $session['user_name']. "',\n" .
+                    "                         " . $p_vat_type_dtl_id. ",\n" .
+                    "                         null)");
+    	            $tr_id = $table->dbconn->GetOne("select last_value from t_cust_acc_dtl_trans_seq");
+    	            $query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no, service_desc, service_charge, vat_charge, description
+                      from sikp.f_get_cust_acc_dtl_trans(".$items['t_cust_account_id'].",'".$date_only[0]."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
+    	            $item = $table->dbconn->GetItem($query,array($tr_id));
+    	            
+    	            $data['success'] = true;
+    	            $data['message'] = 'Data berhasil disimpan';
+    	            $data['items'] = $item;
+	            // all ok, commit transaction
+	            $table->dbconn->CommitTrans();
+	        }catch (Exception $e) {
+	            // something happen, rollback transaction
+	            $table->dbconn->RollbackTrans();
+	            $data['message'] = $e->getMessage();
+	            $data['items'] = $items;
+	        }
+	        
+        }
+    
+        return $data;    
+    }
+	
     /**
      * update
      * controler for update item

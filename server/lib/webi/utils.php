@@ -29,8 +29,8 @@ class wbUtil extends Object
         }
         
         $path = strtolower(strrchr($file['name'], '.'));
-        if(($path!='.jpeg') && ($path!='.jpg') && ($path!='.gif') && ($path!='.png')){
-        	throw new Exception("Tipe file image '".$file['type']."' tidak diperkenankan. Mohon upload file image dengan tipe 'jpg', 'gif', 'png' atau 'bmp'");
+        if(($path!='.jpeg') && ($path!='.jpg') && ($path!='.gif') && ($path!='.png')&& ($path!='.pdf')){
+        	throw new Exception("Tipe file image '".$file['type']."' tidak diperkenankan. Mohon upload file image dengan tipe 'jpg', 'gif', 'png' atau 'pdf'");
         }
         
         return true;

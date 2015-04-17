@@ -6,7 +6,7 @@
  * @since 23-10-2012 12:07:20
  * @author hilman farid
  */
-class t_cust_order_legal_doc_controller extends wbController{    
+class upload_doc_local_controller extends wbController{    
     /**
      * read
      * controler for get all items
@@ -74,14 +74,33 @@ class t_cust_order_legal_doc_controller extends wbController{
      * create
      * controler for create new item
      */    
-	
 	public static function create($args = array()){
         // Security check
-        if (!wbSecurity::check('t_cust_account')) return;
 
         // Get arguments from argument array
+		global $_FILES;
+		/*$current = "tsetsetset";      
+		file_put_contents("C:/xampp/htdocs/mpd-wp/server/abus_teu.txt", $current);  
         extract($args);
-        
+        echo "tes";
+		print_r($_FILES);
+		print_r($_POST);
+		print_r($_GET);
+		if (!move_uploaded_file($_FILES['uploadedfile']['tmp_name'], self::imurl().$_FILES['uploadedfile']['name'])){
+			throw new Exception("Upload file gagal. Mohon periksa direktori bukti transfer");
+		}
+		exit;
+		*/
+		if (!empty($_FILES['uploadedfile']['name'])){
+            try{
+                wbUtil::checkUploadedImage($_FILES['uploadedfile']);
+            }catch (Exception $e) {
+                $data['message'] = $e->getMessage();
+                echo json_encode($data);
+                session_write_close();
+                exit;
+            }
+        }
         $data = array('items' => array(), 'success' => false, 'message' => '');
         
         $jsonItems = wbRequest::getVarClean('items', 'str', '');
@@ -94,8 +113,6 @@ class t_cust_order_legal_doc_controller extends wbController{
 		$origin_file_name = wbRequest::getVarClean('file_name', 'str', '');
 		$file_folder = wbRequest::getVarClean('file_folder', 'int',0);
 		$file_name = wbRequest::getVarClean('file_name', 'int', 0);
-        $jsonItems = wbRequest::getVarClean('items', 'str', '');
-		
 		
         if (!is_array($items)){
             $data['message'] = 'Invalid items parameter';
@@ -134,20 +151,43 @@ class t_cust_order_legal_doc_controller extends wbController{
 	        try{
 	            // begin transaction block
 	            $table->dbconn->BeginTrans();
+			
 	                // insert master
     	            $items[$table->pkey] = $table->dbconn->GetOne("select generate_id('sikp','t_cust_order_legal_doc','t_cust_order_legal_doc_id') from dual");
-    	            $items['description']= $legal_doc_desc;
-					$items['origin_file_name'] = $items['file_name'];
-					$items['file_name'] = time().$items['file_name'];
+    	           
+					if (!empty($_FILES['uploadedfile']['name'])){
+                        $orign_filename = $_FILES['uploadedfile']['name'];
+                        $filename = time().$_FILES['uploadedfile']['name'];
+                        if (!move_uploaded_file($_FILES['uploadedfile']['tmp_name'], self::imurl().$filename)){
+							throw new Exception("Upload file gagal. Mohon periksa direktori bukti transfer");
+						}
+						
+						$path = strtolower(strrchr($_FILES['uploadedfile']['name'], '.'));
+						if(($path=='.jpeg') || ($path=='.jpg') || ($path=='.gif') || ($path=='.png')){
+							$thumbnail = self::imurl().'/th_'.$filename;
+							wbUtil::createThumbnailImage(2, self::imurl().$filename, $thumbnail, 150, 150);
+							
+							$view_picture = self::imurl().'/view_'.$filename;
+							wbUtil::createThumbnailImage(2, self::imurl().$filename, $view_picture, 600, 800);		
+						}	
+    					
+                        $items['file_name'] = $filename1;
+                    }
+
+
+					$items['description']= $legal_doc_desc;
+					$items['origin_file_name'] = $orign_filename;
+					$items['file_name'] = $filename;
+					wbSession::setVar('user_name', $items['user_name']);
 					$table->setRecord($items);
     	            $table->create();
     	            // insert detail
     	            ///////////////////////////////////this is the magic for upload////////////////////////////////////
-					$encoded = $_POST['uploaded']->file_name;
-					$location = self::imurl().$items[$table->pkey].'_'.$items['file_name'];// Mention where to upload the file
-					$current = @file_get_contents($location);                     // Get the file content. This will create an empty file if the file does not exist     
-					$current = base64_decode($encoded);                          // Now decode the content which was sent by the client     
-					file_put_contents($location, $current);                      // Write the decoded content in the file mentioned at particular location
+					//$encoded = $_POST['uploaded']->file_name;
+					//$location = self::imurl().$items[$table->pkey].'_'.$items['file_name'];// Mention where to upload the file
+					//$current = @file_get_contents($location);                     // Get the file content. This will create an empty file if the file does not exist     
+					//$current = base64_decode($encoded);                          // Now decode the content which was sent by the client     
+					//file_put_contents($location, $current);                      // Write the decoded content in the file mentioned at particular location
 					///////////////////////////////////////////////////////////////////////////////////////////////////
     	            
 					$data['success'] = true;
@@ -166,7 +206,6 @@ class t_cust_order_legal_doc_controller extends wbController{
     
         return $data;    
     }
-
     /**
      * update
      * controler for update item
@@ -229,18 +268,36 @@ class t_cust_order_legal_doc_controller extends wbController{
 				$items['file_name'] = time().$items['file_name'];
 	            $table->setRecord($items);
 	            $table->update();
-				
 				$r = $old_row;
-				if (!empty($r['file_name']) && is_file(self::unlinkurl().$items['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-					@unlink(self::unlinkurl().$items['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
+				if (!empty($r['file_name'])){ 
+					print_r($r['file_name']);
+					@unlink(self::unlinkurl().$r['file_name']);
+				}
+				
+				
+				if (!empty($_FILES['uploadedfile']['name'])){
+					$orign_filename = $_FILES['uploadedfile']['name'];
+					$filename = time().$_FILES['uploadedfile']['name'];
+					if (!move_uploaded_file($_FILES['uploadedfile']['tmp_name'], self::imurl().$filename)){
+						throw new Exception("Upload file gagal. Mohon periksa direktori bukti transfer");
+					}
+					
+					$path = strtolower(strrchr($_FILES['uploadedfile']['name'], '.'));
+					if(($path=='.jpeg') || ($path=='.jpg') || ($path=='.gif') || ($path=='.png')){
+						$thumbnail = self::imurl().'/th_'.$filename;
+						wbUtil::createThumbnailImage(2, self::imurl().$filename, $thumbnail, 150, 150);
+						
+						$view_picture = self::imurl().'/view_'.$filename;
+						wbUtil::createThumbnailImage(2, self::imurl().$filename, $view_picture, 600, 800);		
+					}	
 				}
 				
 				///////////////////////////////////this is the magic for upload////////////////////////////////////
-				$encoded = $_POST['uploaded']->file_name;
-				$location = self::imurl().$items[$table->pkey].'_'.$items['file_name'];// Mention where to upload the file
-				$current = @file_get_contents($location);                     // Get the file content. This will create an empty file if the file does not exist     
-				$current = base64_decode($encoded);                          // Now decode the content which was sent by the client     
-				file_put_contents($location, $current);                      // Write the decoded content in the file mentioned at particular location
+				//$encoded = $_POST['uploaded']->file_name;
+				//$location = self::imurl().$items[$table->pkey].'_'.$items['file_name'];// Mention where to upload the file
+				//$current = @file_get_contents($location);                     // Get the file content. This will create an empty file if the file does not exist     
+				//$current = base64_decode($encoded);                          // Now decode the content which was sent by the client     
+				//file_put_contents($location, $current);                      // Write the decoded content in the file mentioned at particular location
 				///////////////////////////////////////////////////////////////////////////////////////////////////
 				
 	            $data['success'] = true;
@@ -265,10 +322,9 @@ class t_cust_order_legal_doc_controller extends wbController{
         
         // Get arguments from argument array
         extract($args);
-    
+		
         $jsonItems = wbRequest::getVarClean('items', 'str', '');
         $items =& wbUtil::jsonDecode($jsonItems);
-        
         $data = array('items' => array(), 'total' => 0, 'success' => false, 'message' => '');
     
         $table =& wbModule::getModel('bds', 't_cust_order_legal_doc');
@@ -304,18 +360,10 @@ class t_cust_order_legal_doc_controller extends wbController{
                     }
 					$old_row = $table->Get($items);
 					$r = $old_row;
-                    //$table->remove($items);
+                    $table->remove($items);
 					
-					if (!empty($r['file_name']) && is_file(self::unlinkurl().$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-						@unlink(self::unlinkurl().$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
-				
-						if (is_file(self::unlinkurl().'th_'.$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-							@unlink(self::unlinkurl().'th_'.$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
-						}
-						if (is_file(self::unlinkurl().'view_'.$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name'])){ 
-							@unlink(self::unlinkurl().'view_'.$old_row['t_cust_order_legal_doc_id'].'_'.$r['file_name']);
-						}
-						
+					if (!empty($r['file_name']) && is_file(self::unlinkurl().$r['file_name'])){ 
+						@unlink(self::unlinkurl().$r['file_name']);		
 					}
 					
 					
@@ -404,7 +452,7 @@ class t_cust_order_legal_doc_controller extends wbController{
             if ($countitems === false){
                 throw new Exception($dbConn_rwnet->ErrorMsg());
             }
-            $total = $table->countAll();
+            //$total = $table->countAll();
         }catch(UserLoginFailedException $e){
             $data['message'] = $e->getMessage();
         }

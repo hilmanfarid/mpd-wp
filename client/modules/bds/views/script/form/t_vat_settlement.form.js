@@ -26,11 +26,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
         this.pengali_denda=0;
         this.fields.service_charge = new Ext.form.TextField({fieldLabel: 'Nama WP', name: 'service_charge', allowBlank: false, width:120});        
         this.fields.t_cust_account_id = new Ext.form.Hidden({fieldLabel: 'Nilai Omzet',allowNegative:false, name: 't_cust_account_id', allowBlank: true,width:220});
-        this.fields.npwd = new Bds.combo.npwd({fieldLabel: 'NPWD', name: 'npwd', allowBlank: true,width:220});
-        this.fields.npwd.on('select',function(cb,rec,index){
-            this.npwd = rec.get('npwd');
-            this.fields.t_cust_account_id.setValue(rec.get('t_cust_account_id'));
-        },this);
+        this.fields.npwd = new Ext.form.TextField({fieldLabel: 'NPWD', name: 'npwd', allowBlank: false,readOnly:true,width:220});
 		this.fields.year_period = new Bds.combo.p_year_period({fieldLabel: 'Periode',editable:false, name: 'p_year_period', allowBlank: false,emptyText:"Pilih Periode Tahun",width:220});
         this.fields.year_period.on('select',function(cb,rec,index){
             this.fields.finance_period.enable();
@@ -69,10 +65,6 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
                 this.fields.p_vat_type_dtl_id.store.baseParams.p_vat_type_dtl_id = this.fields.p_vat_type_dtl_id.getValue();  
                 delete this.fields.p_vat_type_dtl_id.lastQuery;
                 this.fields.p_vat_type_dtl_id.doQuery('', true);
-                
-                this.fields.npwd.store.baseParams.p_vat_type_dtl_id = this.fields.t_cust_account_id.getValue();  
-                delete this.fields.npwd.lastQuery;
-                this.fields.npwd.doQuery('', true);
             }
         }, this);
         this.fields.p_vat_type_dtl_cls_id = new Bds.combo.p_vat_type_dtl_cls({fieldLabel: 'Kelas Pajak', name: 'p_vat_type_dtl_cls_id', allowBlank: true,width:220});

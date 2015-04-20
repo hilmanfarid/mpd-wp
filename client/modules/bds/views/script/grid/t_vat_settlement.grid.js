@@ -100,7 +100,7 @@ Bds.grid.t_vat_settlement = Ext.extend(Webi.grid.GridPanel, {
         var defaultData = {
 			't_cust_acc_dtl_trans_id' : '',
             't_cust_account_id' : this.store.baseParams.t_cust_account_id || '',
-            'npwd' : '',
+            'npwd' : this.npwd.getRawValue() || '',
             'trans_date' : '',
             'trans_date_txt' : '',
             'bill_no' : '',

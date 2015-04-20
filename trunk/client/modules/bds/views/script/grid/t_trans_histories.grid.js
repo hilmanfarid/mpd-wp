@@ -8,6 +8,7 @@
 Bds.grid.t_trans_histories = Ext.extend(Webi.grid.GridPanel, {
     viewConfig:{forceFit:false},
     enableEdit:false,
+	firstTime:true,
     /*plugins:new Ext.ux.grid.ColumnHeaderGroup({
         rows:[
               [
@@ -185,6 +186,17 @@ Bds.grid.t_trans_histories = Ext.extend(Webi.grid.GridPanel, {
             //this.p_vat_type_dtl_id.setValue(rec.get('p_vat_type_dtl_id'));
             this.store.load();
         },this);
+		this.npwd.store.on('load',function(thisstore,records,option){
+            if(this.firstTime){
+                this.npwd.setValue(records[0].get('t_cust_account_id'));
+                this.firstTime=false;
+                this.store.baseParams.t_cust_account_id = records[0].get('t_cust_account_id');
+                this.store.baseParams.p_vat_type_dtl_id = records[0].get('p_vat_type_dtl_id');
+                
+                this.store.load();
+            }
+        },this);
+		this.npwd.store.load();
         this.p_vat_type_dtl_id = new Bds.combo.p_vat_type_dtl({fieldLabel: 'Jenis Ayat', name: 'p_vat_type_dtl_id', allowBlank: true,emptyText:"Jenis Ayat",width:220});
         this.po_tgl_awal = new Ext.form.DateField({fieldLabel: 'Tanggal Awal', name: 'po_tgl_awal', allowBlank: true, format: 'd-m-Y'});
         this.po_tgl_akhir = new Ext.form.DateField({fieldLabel: 'TAnggal Akhir', name: 'po_tgl_akhir', allowBlank: true, format: 'd-m-Y'});

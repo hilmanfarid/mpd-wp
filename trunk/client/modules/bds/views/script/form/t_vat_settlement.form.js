@@ -198,7 +198,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
     submitPembayaran : function(thisform){
         var params = {'user_name' : _UNAME,
                               'npwd' : thisform.npwd,
-                              't_cust_account_id':thisform.fields.npwd.getValue(),
+                              't_cust_account_id':thisform.fields.t_cust_account_id.getValue(),
                               'finance_period':thisform.fields.finance_period.getValue(),
                               'p_vat_type_dtl_id':thisform.fields.p_vat_type_dtl_id.getValue(),
                             'p_vat_type_dtl_cls_id':thisform.fields.p_vat_type_dtl_cls_id.getValue(),

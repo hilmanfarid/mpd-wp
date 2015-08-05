@@ -29,7 +29,34 @@ class dologin_controller extends wbController{
             return $data;
         }
     }
-
+	public static function loginCard()
+    {
+        $data = array('items' => array(), 'total' => 0, 'success' => false, 'message' => '');
+        
+        $card_number = wbRequest::getVarClean('card_number');
+        $npwpd = wbRequest::getVarClean('npwpd');
+        
+        wbUser::delSession();
+        
+        try{
+            $uid = wbUser::logInCard($card_number, $npwpd);
+            
+            $data['items'] = wbUser::getSession();
+            $data['total'] = 0;
+            $data['message'] = 'Login Berhasil';
+            $data['success'] = true;
+            
+            return $data;
+            
+        }catch(UserLoginFailedException $e){
+            $data['items'] = array();
+            $data['total'] = 0;
+            $data['message'] = $e->getMessage();
+            $data['success'] = false;
+            
+            return $data;
+        }
+    }
     public static function logout(){
         wbUser::delSession();
         $_COOKIE = '';

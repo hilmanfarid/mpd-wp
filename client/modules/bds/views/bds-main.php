@@ -77,6 +77,9 @@ Ext.extend(AppMainPanel, Ext.TabPanel, {
 /**
  * Listen to all exception events
  */
+ function onItemClick(item){
+        alert('testing shia');
+    }
 Ext.data.DataProxy.addListener('exception', function(proxy, type, action, options, res) {
     if (type === 'remote'){
         Ext.Msg.show({
@@ -107,7 +110,30 @@ Ext.data.DataProxy.addListener('exception', function(proxy, type, action, option
 Ext.onReady(function(){
     var appTreeMenu = new AppTreeMenuPanel();
     var appMain = new AppMainPanel();
-
+    var menu_helper = new Ext.menu.Menu({
+        id: 'mainMenu1',
+        style: {
+            overflow: 'visible'     // For the Combo popup
+        },
+        items: [
+            {
+                text: 'Contoh Xls',
+                handler:onItemClick
+            }
+            ]
+        });
+    /*var item_help = menu_helper.add({
+        text: 'Contoh Xls',
+        handler:onItemClick
+    });
+    item_help.on('click', function(){alert('tes')});*/
+    var btn_helper=new Ext.Button({
+                    text:'Help',
+                    value:'Filter',
+                    iconCls: '',  // <-- icon
+                    hidden:false,
+                    menu: menu_helper  // assign menu by instance
+                });
     var appHeader = new Ext.Panel({
         border: false,
         layout:'anchor',
@@ -214,6 +240,11 @@ Ext.onReady(function(){
                 },
                 scope: this
             },'-',
+            {
+                text:'Help',
+                menu: menu_helper  // assign menu by instance
+            },
+            '-',
             /* tobe continued
             {
                 itemId: 'btnSetting',

@@ -280,7 +280,7 @@ class t_vat_settlement_controller extends wbController{
 		$pdf->SetAligns(array("L","L","L"));
     	$pdf->SetWidths(array(40,4,80));
     	$pdf->ln(2);
-    	$pdf->RowMultiBorderWithHeight(array("WAJIB PAJAK",":",$items['wp_name']),array('','',''),6);
+    	$pdf->RowMultiBorderWithHeight(array("MERK DAGANG",":",$items['company_brand']),array('','',''),6);
 		
 		$pdf->SetAligns(array("L","L","L","C"));
     	$pdf->SetWidths(array(40,4,80,70));

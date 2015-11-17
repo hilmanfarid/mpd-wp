@@ -281,6 +281,7 @@ class t_vat_settlement_controller extends wbController{
     	$pdf->SetWidths(array(40,4,80));
     	$pdf->ln(2);
     	$pdf->RowMultiBorderWithHeight(array("MERK DAGANG",":",$items['company_brand']),array('','',''),6);
+		$pdf->RowMultiBorderWithHeight(array("ALAMAT",":",$items['brand_address_name']." ".$items['brand_address_no']),array('','',''),6);
 		
 		$pdf->SetAligns(array("L","L","L","C"));
     	$pdf->SetWidths(array(40,4,80,70));

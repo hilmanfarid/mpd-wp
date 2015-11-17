@@ -380,7 +380,7 @@ class t_vat_settlement_controller extends wbController{
 		//return $data;
         try {
             $user_name = wbSession::getVar('user_name');
-            $sql = "select x.company_brand,to_char(a.settlement_date,'dd-mm-yyyy') as settlement_date,to_char(a.settlement_date,'HH24:MI:ss') as pukul,a.npwd,wp_name,vat_code,z.code, nvl(total_vat_amount,0)as total_vat_amount,nvl(total_penalty_amount,0) as total_penalty_amount,nvl(total_vat_amount,0)+nvl(total_penalty_amount,0) as total_bayar,payment_key,
+            $sql = "select x.company_brand,x.brand_address_name,x.brand_address_no,to_char(a.settlement_date,'dd-mm-yyyy') as settlement_date,to_char(a.settlement_date,'HH24:MI:ss') as pukul,a.npwd,wp_name,vat_code,z.code, nvl(total_vat_amount,0)as total_vat_amount,nvl(total_penalty_amount,0) as total_penalty_amount,nvl(total_vat_amount,0)+nvl(total_penalty_amount,0) as total_bayar,payment_key,
 				replace(f_terbilang(to_char(nvl(total_vat_amount,0)+nvl(total_penalty_amount,0)),'IDR'),'    sen ','') as dengan_huruf 
 				from sikp.t_vat_setllement a
 				left join sikp.t_cust_account x on a.t_cust_account_id =x.t_cust_account_id 

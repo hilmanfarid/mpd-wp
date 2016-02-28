@@ -111,8 +111,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
 				'z-index' : 9000
 			},
     
-            items: [
-                new Ext.ux.form.FileUploadField({
+            items: [new Ext.ux.form.FileUploadField({
                     emptyText: 'Upload File',
                     fieldLabel: 'File Excel',
                     name: 'excel_trans_cust',
@@ -124,7 +123,8 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
                     anchor: '95%'
                 }),
                 new Ext.form.Hidden({id:'form_t_cust_acc_id',fieldLabel: 't_cust_account_id', name: 't_cust_account_id', allowBlank: true,anchor:'95%',height:200,readOnly:true}),
-                new Ext.form.Hidden({id:'form_p_vat_type_dtl_id',fieldLabel: 'p_vat_type_dtl_id', name: 'p_vat_type_dtl_id', allowBlank: true,anchor:'95%',height:200,readOnly:true})
+                new Ext.form.Hidden({id:'form_p_vat_type_dtl_id',fieldLabel: 'p_vat_type_dtl_id', name: 'p_vat_type_dtl_id', allowBlank: true,anchor:'95%',height:200,readOnly:true}),
+				new Ext.form.Label({xtype: 'textfield',fieldLabel: '<a href="var/uploadexcel/contoh_format_file_transaksi_harian_WP.xls">Contoh Excel</a>',labelSeparator : ""})
             ],
     
             buttons: [{

@@ -10,7 +10,7 @@ Bds.store.t_vat_settlement = function(config){
 	Ext.applyIf(config, {
         proxy: new Ext.data.HttpProxy({
             api: {
-                read : Webi.ROUTE_URL + '&class=t_vat_settlement&method=read',
+                read : Webi.ROUTE_URL + '&class=t_vat_settlement&method=readBlank',
                 create : Webi.ROUTE_URL + '&class=t_vat_settlement&method=create',
                 update: Webi.ROUTE_URL + '&class=t_vat_settlement&method=update',
                 destroy: Webi.ROUTE_URL + '&class=t_vat_settlement&method=destroy'

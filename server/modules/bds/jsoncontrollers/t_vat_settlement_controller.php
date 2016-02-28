@@ -312,7 +312,9 @@ class t_vat_settlement_controller extends wbController{
             if(empty($item['p_vat_type_dtl_cls_id'])){
                 $item['p_vat_type_dtl_cls_id'] = 'null';
             }
-            $sql = "select o_mess,o_pay_key from f_vat_settlement_manual_wp(".$item['t_cust_account_id'].",".$item['finance_period'].",'".$item['npwd']."','".$item['start_period']."','".$item['end_period']."',null,".$item['total_trans_amount'].",".$item['total_vat_amount'].",".$item['p_vat_type_dtl_id'].",".$item['p_vat_type_dtl_cls_id'].", '".$user_name."')";
+            $sql = "select o_mess,o_pay_key,o_cust_order_id,o_vat_set_id from f_vat_settlement_manual_wp(".$item['t_cust_account_id'].",".$item['finance_period'].",'".$item['npwd']."','".$item['start_period']."','".$item['end_period']."',null,".$item['total_trans_amount'].",".$item['total_vat_amount'].",".$item['p_vat_type_dtl_id'].",".$item['p_vat_type_dtl_cls_id'].", '".$user_name."')";
+			//$data['items'] = $sql;
+			//return $data;
             $message = $table->dbconn->GetAll($sql);
             $sql = "select * from f_get_penalty_amt(".$item['total_vat_amount'].",".$item['finance_period'].",".$item['p_vat_type_dtl_id'].");";
             $penalty = $table->dbconn->GetOne($sql);
@@ -321,6 +323,12 @@ class t_vat_settlement_controller extends wbController{
                 $data['success'] = false;
             }else{
                 $data['success'] = true;
+				$params = json_encode(array(
+											't_vat_settlement'=>$message[0]['o_vat_set_id'],
+											't_customer_order_id'=>$message[0]['o_cust_order_id']
+											));
+				$_POST ['items']= $params;
+				self::submitSptpd();
             }
             $data['items'] = $message[0];
             $data['message'] = $message[0]['o_mess'];
@@ -347,7 +355,8 @@ class t_vat_settlement_controller extends wbController{
                 //$sql="select sikp.f_first_submit_engine(501,".$item['t_customer_order_id'].",'".$user_name."')";   
                 $sql = "select sikp.f_before_submit_sptpd_wp(".$items['t_vat_setllement_id'].",'".$user_name."')";
                 $message=$table->dbconn->GetOne($sql);
-                if(trim($message)=='OK'){
+                //if(trim($message)=='OK'){
+				if(true){
                     $sql="select o_result_msg from sikp.f_first_submit_engine(501,".$items['t_customer_order_id'].",'".$user_name."')";   
                     $message=$table->dbconn->GetOne($sql);
                     if($message=='OK'){
@@ -399,6 +408,35 @@ class t_vat_settlement_controller extends wbController{
             
             return $data;
         }catch(Exception $e) {
+            $data['success'] = false;
+            $data['message'] = $e->getMessage();
+            return $data;   
+        }
+    }
+	
+	public static function deleteDSR($args = array()){
+        $jsonItems = wbRequest::getVarClean('items', 'str', '');        
+        $item = wbUtil::jsonDecode($jsonItems);
+		
+        $table =& wbModule::getModel('bds', 'cust_acc_trans');
+        //$table->actionType = 'DELETE';
+        
+        $data = array('items' => array(), 'total' => 0, 'success' => true, 'message' => '');
+		
+		try {
+            $user_name = wbSession::getVar('user_name');
+            $sql = "DELETE FROM t_cust_acc_dtl_trans a
+					WHERE a.t_cust_account_id = ".$item['t_cust_account_id']."
+					and not exists (select 1 from t_vat_setllement_dtl x where x.t_cust_acc_dtl_trans_id = a.t_cust_acc_dtl_trans_id)";
+            $items = $table->dbconn->GetItem($sql);
+			$data['items'] = $item;
+            $data['message'] = 'Berhasil';
+            $data['success'] = true;
+            $data['items'] = $items;
+            
+            return $data;
+        }catch(Exception $e) {
+			
             $data['success'] = false;
             $data['message'] = $e->getMessage();
             return $data;   

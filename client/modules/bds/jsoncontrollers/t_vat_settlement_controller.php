@@ -44,6 +44,20 @@ class t_vat_settlement_controller extends wbController{
         return $data;
 
     }
+	
+	public static function readBlank($args = array()){
+        // Security check
+        //if (!wbSecurity::check('DHotel')) return;
+
+        // Get arguments from argument array
+        //extract($args);
+
+        $data = array('items' => array(), 'total' => 0, 'success' => true, 'message' => '');
+
+        
+        return $data;
+
+    }
 
     /**
      * create
@@ -330,6 +344,149 @@ class t_vat_settlement_controller extends wbController{
     	$pdf->Output(time()."_kwitansi_".$no_bayar,"I");
 		exit;
 		
+    }
+	public static function uploadExcel($args = array()){
+        //$temp_cust_account = self::getNpwd();
+		
+		//delete DSR yang belum di submit
+		$data = array('items' => array(), 'total' => 0, 'success' => false, 'message' => '');
+        try{
+            $ws_client = self::getNusoap();
+        
+		    $params = array('search' => '',
+					'getParams' => json_encode($_GET),
+					'controller' => json_encode(array('module' => 'bds','class' => 't_vat_settlement', 'method' => 'deleteDSR', 'type' => 'json' )),
+					'postParams' => json_encode($_POST),
+					'jsonItems' => '',
+					'start' => $start,
+					'limit' => $limit);
+					
+            $ws_data = self::getResultData($ws_client, $params);
+            $data['items'] = $ws_data ['data'];
+            $data['total'] = $ws_data ['total'];
+            $data['message'] = $ws_data ['message'];
+            $data['success'] = $ws_data ['success'];
+        }catch (Exception $e) {
+            $data['message'] = $e->getMessage();
+        }
+		
+		if ($data['success'] == true){
+			//upload data transaksi
+			global $_FILES;
+			try {
+				//'excel_file' adalah nama field di form
+				if(empty($_FILES['excel_trans_cust']['name'])){
+					throw new Exception('File tidak boleh kosong');
+				}
+			}catch (Exception $e) {
+				echo $e->getMessage();
+				exit;
+			}
+			
+			$file_name = $_FILES['excel_trans_cust']['name']; // <-- File Name
+			$file_location = 'var/uploadexcel/'.$file_name; // <-- LOKASI Upload File
+		
+			//upload file ke lokasi tertentu
+			try {
+				if (!move_uploaded_file($_FILES['excel_trans_cust']['tmp_name'], $file_location)){
+					throw new Exception("Upload file gagal");
+				}
+			}catch(Exception $e) {
+				echo $e->getMessage();
+				exit;
+			}
+			
+			include('lib/excel/reader.php');
+			$xl_reader = new Spreadsheet_Excel_Reader();
+			$res = $xl_reader->_ole->read($file_location);
+		
+			if($res === false) {
+				if($xl_reader->_ole->error == 1) {
+					echo "File Harus Format Excel";
+					exit;
+				}
+			}
+			
+			
+			try{
+				 $xl_reader->read($file_location);
+				 $firstColumn = $xl_reader->sheets[0]['cells'][1][1];
+		
+						 
+				// $DBConnect = new clsDBConnSIKP();  		
+				 $session = wbUser::getSession();
+				 //$sqll = "select * from f_get_npwd_by_username('".$session['user_id']."') AS tbl (ty_lov_npwd) where rownum < 2 ";
+				 //$DBConnect->query($sqll);
+				 //while ($DBConnect->next_record()){
+				//	$value = $DBConnect->f("ty_lov_npwd");		 
+				// }
+				 $t_cust_account_id = wbRequest::getVarClean('t_cust_account_id','int', 0);	
+				 //$i_t_cust_id = CCGetFromGet("t_cust_account_id","");
+				 //$i_t_cust_account_id = empty($i_t_cust_id) ? $value : $i_t_cust_id;
+		
+				 //$i_trans = CCGetFromGet("trans_date","");
+				 //$i_tgl_trans = empty($i_trans) ? date('Y-m-d') : $i_trans;
+				 //$uname = CCGetUserLogin(); //harap diubah
+		
+				 //$uploadForm->t_cust_account_id->SetValue($i_t_cust_account_id);
+				 //$uploadForm->trans_date->SetValue($i_tgl_trans);
+				 $items= array();	
+				 for($i = 2; $i <= $xl_reader->sheets[0]['numRows']; $i++) {
+					   $item['t_cust_account_id'] = $t_cust_account_id; 
+					   $item['i_tgl_trans'] =  $xl_reader->sheets[0]['cells'][$i][1]; 	
+					   $item['i_bill_no'] =  $xl_reader->sheets[0]['cells'][$i][2];
+					   $item['i_serve_desc'] =  $xl_reader->sheets[0]['cells'][$i][3];
+					   $item['i_serve_charge'] =  $xl_reader->sheets[0]['cells'][$i][4];
+					   //$i_vat_charge = $xl_reader->sheets[0]['cells'][$i][4];
+					   $item['i_vat_charge'] = "null";
+					   $item['i_desc'] = $xl_reader->sheets[0]['cells'][$i][5];   
+					   $item['p_vat_type_dtl_id'] = $temp_cust_account['items'][0]['p_vat_type_dtl_id'];                
+					   $items[]=$item;
+				 } 
+				 $_POST['p_vat_type_dtl_id']=$temp_cust_account['items'][0]['p_vat_type_dtl_id'];
+				 $_POST['items']=json_encode($items);
+				 //echo json_encode($items); exit;
+				 $data = self::createCustAccTrans();
+				 echo json_encode($data);
+				 exit;
+			} catch(Exception $e) {
+				echo $e->getMessage();
+				exit;
+			}
+		}
+		echo json_encode ($data);
+		exit;
+    }
+	
+	public static function createCustAccTrans($args = array()){
+        // Security check
+        //if (!wbSecurity::check('DHotel')) return;
+
+        // Get arguments from argument array
+        $jsonItems = wbRequest::getVarClean('items', 'str', '');
+        $items =& wbUtil::jsonDecode($jsonItems);
+
+        $data = array('items' => array(), 'total' => 0, 'success' => false, 'message' => '');
+    
+        try{
+            $ws_client = self::getNusoap();
+		    $params = array('search' => '',
+		    			'getParams' => json_encode($_GET),
+		    			'controller' => json_encode(array('module' => 'bds','class' => 'cust_acc_trans', 'method' => 'create', 'type' => 'json' )),
+		    			'postParams' => json_encode($_POST),
+		    			'jsonItems' => '',
+		    			'start' => $start,
+		    			'limit' => $limit);
+		    
+            $ws_data = self::getResultData($ws_client, $params);  
+            $data['items'] = $ws_data ['data'];
+            $data['total'] = 1;
+            $data['message'] = $ws_data ['message'];
+            $data['success'] = $ws_data ['success'];
+        }catch (Exception $e) {
+            $data['message'] = $e->getMessage();
+        }
+        return $data;
     }
 }
 ?>

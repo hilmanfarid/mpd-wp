@@ -8,8 +8,8 @@
 Bds.module.t_vat_settlement = Ext.extend(Webi.module.Panel, {
     addTitle: 'Tambah Data Pelaporan',
     editTitle: 'Update Data Pelaporan',
-    winWidth:400,
-    winHeight:400,
+    winWidth:500,
+    winHeight:500,
     /**
      * initComponent
      * @protected

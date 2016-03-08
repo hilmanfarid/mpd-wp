@@ -18,7 +18,7 @@ Bds.module.t_trans_histories = Ext.extend(Webi.module.Panel, {
         Bds.module.t_trans_histories.superclass.initComponent.call(this);
     },
     buildPanel : function(){
-        this.grid = new Bds.grid.t_trans_histories({border: false});
+        this.grid = new Bds.grid.t_trans_histories_new({border: false});
         this.initGridEvents();
         
         return this.grid;

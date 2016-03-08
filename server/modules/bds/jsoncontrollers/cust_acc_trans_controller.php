@@ -26,7 +26,7 @@ class cust_acc_trans_controller extends wbController{
         $query = wbRequest::getVarClean('query', 'str', '');
 
         $t_cust_account_id = wbRequest::getVarClean('t_cust_account_id', 'int', 0);
-		$trans_date = wbRequest::getVarClean('trans_date', 'str', '');
+		$trans_date = wbRequest::getVarClean('trans_date', 'date', '');
 		$p_vat_type_dtl_id = wbRequest::getVarClean('p_vat_type_dtl_id', 'int', 0);
 		
 		$date_start = wbRequest::getVarClean('date_start', 'str', '');
@@ -314,6 +314,7 @@ class cust_acc_trans_controller extends wbController{
             $data['message'] = 'Invalid items parameter';
             return $data;
         }
+		$items_return  = array();
         $table =& wbModule::getModel('bds', 'cust_acc_trans');
         $table->actionType = 'CREATE';
         if (isset($items[0])){
@@ -336,14 +337,19 @@ class cust_acc_trans_controller extends wbController{
                             return $data;
                         }*/
         	            //$cust_id = $table->dbconn->GetOne("select t_cust_account_id".$session['user_id']);
+						$tgl_trans = empty($items[$i]["i_tgl_trans"]) ? $date_only[0] : $items[$i]["i_tgl_trans"];
+						$bill_no = empty($items[$i]["i_bill_no"]) ? $items[$i]["bill_no"] : $items[$i]["i_bill_no"];;
+						$serve_desc = empty($items[$i]["i_serve_desc"]) ? $items[$i]["service_desc"] : $items[$i]["i_serve_desc"];;
+						$serve_charge = empty($items[$i]["i_serve_charge"]) ? $items[$i]["service_charge"] : $items[$i]["i_serve_charge"];;
+						$description = empty($items[$i]["i_description"]) ? $items[$i]["description"] : $items[$i]["i_description"];;
                         $table->dbconn->Execute("select o_result_code, o_result_msg from \n" .
                         "f_ins_cust_acc_dtl_trans(" . $items[$i]["t_cust_account_id"]. ",\n" .
-                        "                         '" . $items[$i]["i_tgl_trans"]. "',\n" .
-                        "                         '" . $items[$i]["i_bill_no"]. "',\n" .
-                        "                         '" . $items[$i]["i_serve_desc"]. "',\n" .
-                        "                         " . $items[$i]["i_serve_charge"]. ",\n" .
+                        "                         '" . $tgl_trans . "',\n" .
+                        "                         '" . $bill_no. "',\n" .
+                        "                         '" . $serve_desc. "',\n" .
+                        "                         " . $serve_charge. ",\n" .
                         "                         null,\n" .
-                        "                         '" . $items[$i]["i_description"]. "',\n" .
+                        "                         '" . $description. "',\n" .
                         "                         '" . $session['user_name']. "',\n" .
                         "                         '" . $p_vat_type_dtl_id. "',\n" .
                         "                         null)");
@@ -357,6 +363,10 @@ class cust_acc_trans_controller extends wbController{
                         "                         '" . $items[$i]["i_description"]. "',\n" .
                         "                         '" . $session['user_name']. "')";
                         exit;*/
+						$tr_id = $table->dbconn->GetOne("select last_value from t_cust_acc_dtl_trans_seq");
+						$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no, service_desc, service_charge, vat_charge, description
+						  from sikp.f_get_cust_acc_dtl_trans(".$items[$i]["t_cust_account_id"].",'".$date_only[0]."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
+						$items_return[] = $table->dbconn->GetItem($query,array($tr_id));
                 	    $numSaved++;
                 	    
         			$table->dbconn->CommitTrans();
@@ -375,7 +385,7 @@ class cust_acc_trans_controller extends wbController{
         		$data['success'] = true;
         		$data['message'] = 'Data berhasil disimpan';
         	}
-        	$data['items'] =$items;
+        	$data['items'] =$items_return;
         }else{
 	        try{
 	            // begin transaction block

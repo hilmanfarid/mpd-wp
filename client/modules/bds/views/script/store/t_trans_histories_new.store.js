@@ -27,6 +27,7 @@ Bds.store.t_trans_histories_new = function(config){
             {name : 'p_vat_type_id', type: 'int'},
             {name : 'p_vat_type_dtl_id', type: 'int'},
             {name : 't_cust_account_id', type: 'int'},
+            {name : 't_customer_order_id', type: 'int'},
             {name : 'start_period', type: 'date', dateFormat: 'Y-m-d'},
             {name : 'end_period', type: 'date', dateFormat: 'Y-m-d'},
             

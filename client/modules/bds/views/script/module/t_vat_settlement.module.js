@@ -20,7 +20,11 @@ Bds.module.t_vat_settlement = Ext.extend(Webi.module.Panel, {
 		this.win.on('hide', function(w){
 			this.form.reset();
 			this.grid.store.load();
-		}, this);		
+		}, this);
+		this.form.on('hide',function(){
+			this.win.hide();
+			this.form.show();
+		},this);
     },
     initComponent : function() {
         // super

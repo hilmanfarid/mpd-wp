@@ -325,9 +325,22 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
                     });
             return;
         }
+		
+		var messageHtml = "";
+		messageHtml += "<table>";
+		messageHtml += "<tr><td colspan='3' align='center'>Wajib Pajak yang terhormat</td></tr>";
+		messageHtml += "<tr><td colspan='3' align='center'>Anda Melaporkan pajak daerah untuk : </td></tr>";
+		messageHtml += "<tr><td>NPWPD</td> <td>:</td> <td>"+this.fields.npwd.getValue()+"</td></tr>";
+		messageHtml += "<tr><td>Klasifikasi</td> <td>:</td> <td>"+this.fields.p_vat_type_dtl_id.getRawValue()+"</td></tr>";
+		messageHtml += "<tr><td>Masa Pajak</td> <td>:</td> <td>"+this.fields.finance_period.getRawValue()+"</td></tr>";
+		messageHtml += "<tr><td>Pajak Pokok</td> <td>:</td> <td>Rp. "+Ext.util.Format.number(this.fields.total_vat_amount.getValue(), '0.000,00/i')+"</td></tr>";
+		messageHtml += "<tr><td>Denda</td> <td>:</td> <td>Rp. "+Ext.util.Format.number(this.fields.penalty_amount.getValue(), '0.000,00/i')+"</td></tr>";
+		messageHtml += "<tr><td>Jumlah Pajak yang harus dibayar</td> <td>:</td> <td>Rp. "+Ext.util.Format.number(this.fields.total_amount.getValue(), '0.000,00/i')+"</td></tr>";
+		messageHtml += "<tr><td colspan='3'>Apakah anda yakin akan mengirim laporan dimaksud?</td></tr>";
+		messageHtml += "</table>";
         Ext.Msg.show({
             title:'Konfirmasi',
-            msg: ('Apakah anda yakin untuk menambah data pembayaran?'),
+            msg: messageHtml,
             buttons: Ext.Msg.YESNO,
             icon: Ext.MessageBox.INFO,
             fn: function(btn,txt,option){

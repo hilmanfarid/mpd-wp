@@ -25,7 +25,15 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
         this.jumlah_bulan=0;
         this.pengali_denda=0;
 		this.t_transaksi_harian= new Bds.module.t_transaksi_harian();
-		
+		this.t_transaksi_harian.grid.on('save',function(store,batch,data){
+			//alert(store.getAt(0).get('service_charge'));
+			jumlah = 0;
+			for(i=0 ; i<store.getCount(); i++){	
+				jumlah += store.getAt(i).get('service_charge');
+			}
+			this.fields.total_trans_amount.setValue(jumlah);
+			this.hitungPajak();
+		},this);
 		this.editableWin = new Ext.Window({
 			title: 'Add',
 			layout: 'fit',
@@ -170,7 +178,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
         });
 		
 		this.filter=new Ext.Button({
-                    text:'UPLOAD TRANSAKSI HARIAN',
+                    text:'UPLOAD FILE TRANSAKSI',
                     value:'Filter',
                     iconCls: '',  // <-- icon
                     hidden:false,
@@ -183,7 +191,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
 					 scope:this});
 					 
 		this.showTransBtn = new Ext.Button({
-					 text:'BUKA',
+					 text:'ISI FORM TRANSAKSI HARIAN',
 					 handler:this.onShowTrans,
 					 scope:this});	
 		return [
@@ -237,13 +245,20 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
                                                                                         name: '',
                                                                                         value: ''
                                                                                      },
-                                                                                     this.filter
+                                                                                     this.filter,
+																					 //new Ext.form.Label({xtype: 'textfield',fieldLabel: ' Atau ',labelSeparator : ""}),
+																					 {
+                                                                                        xtype: 'displayfield',
+                                                                                        fieldLabel: '  ',
+                                                                                        name: '',
+                                                                                        value: '&nbsp atau &nbsp'
+                                                                                     },
+																					 this.showTransBtn,
                                                                                      ]
                                                                                      
                     }
                 ]
             },
-			this.showTransBtn,
 			this.fields.total_trans_amount,
             this.fields.total_vat_amount,
             this.fields.penalty_amount,
@@ -299,6 +314,17 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
         this.fields.total_amount.setValue(this.fields.total_vat_amount.getValue()+this.fields.penalty_amount.getValue());
     },
     onCreate : function(btn, ev) {
+		if(Ext.isEmpty(this.fields.finance_period.getValue()) || Ext.isEmpty(this.fields.start_period.getValue()) ||
+			Ext.isEmpty(this.fields.end_period.getValue()) || Ext.isEmpty(this.fields.total_trans_amount.getValue())){
+            Ext.Msg.show({
+                        title:'Perhatian',
+                        msg: 'Silahkan isi data dengan lengkap.',
+                        buttons: Ext.Msg.OK,
+                        icon: Ext.MessageBox.INFO,
+                        minWidth: 200
+                    });
+            return;
+        }
         Ext.Msg.show({
             title:'Konfirmasi',
             msg: ('Apakah anda yakin untuk menambah data pembayaran?'),
@@ -319,7 +345,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
                         title:'Perhatian',
                         msg: 'Anda Belum Mendaftarkan No Bayar',
                         buttons: Ext.Msg.OK,
-                        icon: Ext.MessageBox.ERROR,
+                        icon: Ext.MessageBox.INFO,
                         minWidth: 200
                     });
             return;
@@ -366,13 +392,28 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
             failure: function(form, action) {
                 //thisform.hideActionProgress('create', false);
                 var message = action.result.message;
-                    Ext.Msg.show({
+				var o_cust_order_id = action.result.items.o_cust_order_id;
+				if (o_cust_order_id == -12){
+					Ext.Msg.show({
                         title:'Perhatian',
                         msg: (message),
                         buttons: Ext.Msg.OK,
-                        icon: Ext.MessageBox.ERROR,
+						fn: function() {
+							getModuleExt('t_trans_histories');
+							thisform.hide();
+						},
+                        icon: Ext.MessageBox.INFO,
                         minWidth: 200
                     });
+				}else{
+					Ext.Msg.show({
+                        title:'Perhatian',
+                        msg: (message),
+                        buttons: Ext.Msg.OK,
+                        icon: Ext.MessageBox.INFO,
+                        minWidth: 200
+                    });
+				}
             },
             scope: thisform
 	     });
@@ -391,7 +432,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
                     title:'Perhatian',
                     msg: ('Submit Gagal'),
                     buttons: Ext.Msg.OK,
-                    icon: Ext.MessageBox.ERROR,
+                    icon: Ext.MessageBox.INFO,
                     minWidth: 200
                 });
             }
@@ -404,6 +445,11 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
     },
 	
     onSubmit : function(){
+		if(Ext.isEmpty(this.fields.start_period.getValue())||Ext.isEmpty(this.fields.end_period.getValue())|| Ext.isEmpty(this.fields.finance_period.getValue())){
+			this.menu.hide();
+			Ext.Msg.alert('Warning', 'Periode, Periode Awal, dan Periode Akhir masih belum benar');
+			return;
+		}
         var thisgrid = this;
 		this.menu.hide();
         this.simpleform.getForm().submit({
@@ -411,8 +457,14 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
 	        waitMsg: 'Menyimpan data...',
 	        params: {
 				't_cust_account_id' : this.fields.t_cust_account_id.getValue(),
+				'p_vat_type_dtl_id' : this.fields.p_vat_type_dtl_id.getValue(),
+				'start_period' : Ext.util.Format.date(this.fields.start_period.getValue(), 'Y-m-d'),
+				'end_period' : Ext.util.Format.date(this.fields.end_period.getValue(), 'Y-m-d'),
     			items: Ext.encode({
-					't_cust_account_id' : this.fields.t_cust_account_id.getValue()
+					't_cust_account_id' : this.fields.t_cust_account_id.getValue(),
+					'p_vat_type_dtl_id' : this.fields.p_vat_type_dtl_id.getValue(),
+					'start_period' : Ext.util.Format.date(this.fields.start_period.getValue(), 'Y-m-d'),
+					'end_period' : Ext.util.Format.date(this.fields.end_period.getValue(), 'Y-m-d')
 				})
 	        },
             success: function(form, action) {
@@ -420,7 +472,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
 				var jumlah=0;
 				for (i = 0; i<action.result.items.length;i++){
 					var item = action.result.items[i];
-					jumlah += parseFloat(item.i_serve_charge);
+					jumlah += parseFloat(item.service_charge);
 				}
 				this.fields.total_trans_amount.setValue(jumlah);
 				this.hitungPajak();
@@ -491,7 +543,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
 		this.editableWin.items.get(0).grid.fields.trans_date.setMinValue(this.fields.start_period.getValue());
 		this.editableWin.items.get(0).grid.fields.trans_date.setMaxValue(this.fields.end_period.getValue());
 		this.editableWin.items.get(0).grid.fields.trans_date.setValue(this.fields.start_period.getValue());
-		this.editableWin.items.get(0).grid.store.removeAll();
+		//this.editableWin.items.get(0).grid.store.removeAll();
 		this.editableWin.items.get(0).grid.store.baseParams.t_cust_account_id=this.fields.t_cust_account_id.getValue();
 		this.editableWin.items.get(0).grid.store.baseParams.p_vat_type_dtl_id=this.fields.p_vat_type_dtl_id.getValue();  
 		this.editableWin.items.get(0).grid.store.baseParams.start_period=this.fields.start_period.getValue();

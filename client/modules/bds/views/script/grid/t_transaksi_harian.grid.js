@@ -8,7 +8,8 @@
 Bds.grid.t_transaksi_harian = Ext.extend(Webi.grid.EditorGridPanel, {
     firstIndex: 'npwd',
     pageSize: null,
-    usePaging: false,     
+    usePaging: false,  
+	enableAdd: false,
     viewConfig: {
         forceFit: false
     }, 
@@ -18,7 +19,7 @@ Bds.grid.t_transaksi_harian = Ext.extend(Webi.grid.EditorGridPanel, {
 
         this.fields = {};
         this.fields.npwd = new Ext.form.TextField({name: 'npwd', allowBlank: false, width:0});
-        this.fields.trans_date = new Ext.form.DateField({name: 'trans_date', allowBlank: true, format: 'd-m-Y'});
+        this.fields.trans_date = new Ext.form.DateField({name: 'trans_date', allowBlank: true, format: 'Y-m-d'});
         this.fields.trans_date_txt = new Ext.form.Hidden({name: 'trans_date_txt', allowBlank: false, width:0});
         this.fields.bill_no = new Ext.form.TextField({name: 'bill_no', allowBlank: false, width:100});
         this.fields.service_desc = new Ext.form.Hidden({name: 'service_desc', allowBlank: false, width:0});
@@ -42,7 +43,7 @@ Bds.grid.t_transaksi_harian = Ext.extend(Webi.grid.EditorGridPanel, {
 				dataIndex: 'p_vat_type_dtl_id', sortable: true, hidden: true
 			},
 			{
-				header: 'Tanggal', editor: this.fields.trans_date,
+				header: 'Tanggal',
 				dataIndex: 'trans_date', sortable: true, hidden: false,renderer: Webi.format.dateRenderer
 			},
 			{
@@ -60,6 +61,16 @@ Bds.grid.t_transaksi_harian = Ext.extend(Webi.grid.EditorGridPanel, {
         ];
         // super
         Bds.grid.t_transaksi_harian.superclass.initComponent.call(this);
+		this.on('afteredit', function(e){
+            //alert ('test');
+			if(this.enableAdd == true || this.enableEdit == true) {
+                if (this.batchWrite == false){
+                    if (this.getSaveButton().disabled) this.getSaveButton().enable();
+                }else{
+                    if (!this.getSaveButton().disabled) this.getSaveButton().disable();
+                }
+            }
+        }, this);
     },
     getDefaultData: function(){
         var defaultData = {

@@ -17,10 +17,7 @@ Bds.grid.t_trans_histories_new = Ext.extend(Webi.grid.GridPanel, {
         this.colModel= new Ext.grid.ColumnModel({
 				columns: [
 					{header: 't_vat_setllement_id', hidden: true, sortable: true, dataIndex: 't_vat_setllement_id', width: 112},
-                    {header: 'start_period', hidden: true, sortable: true, dataIndex: 'start_period', width: 112, renderer: Webi.format.dateRenderer},
-                    {header: 'end_period', hidden: true, sortable: true, dataIndex: 'end_period', width: 112, renderer: Webi.format.dateRenderer},
-                    
-					{header: 'Jenis', hidden: false, sortable: true, dataIndex: 'type_code', width: 185},
+                    {header: 'Jenis', hidden: false, sortable: true, dataIndex: 'type_code', width: 185},
                     {header: 'Periode',hidden: false, sortable: true, dataIndex: 'periode_pelaporan', width: 123},
                     {header: 'Tgl.Lapor',hidden: false, sortable: true, dataIndex: 'tgl_pelaporan', width: 112},
                     {header: 'Total Transaksi',hidden: false, sortable: true, dataIndex: 'total_transaksi', width: 112,renderer: Webi.format.floatRenderer},
@@ -48,8 +45,6 @@ Bds.grid.t_trans_histories_new = Ext.extend(Webi.grid.GridPanel, {
 				defaultSortable: true,
 				rows: [
 					[
-						{rowspan: 2},
-						{rowspan: 2},
 						{rowspan: 2},
 						{rowspan: 2},
 						{rowspan: 2},

@@ -31,6 +31,7 @@ class t_trans_histories extends AbstractTable{
                         	from 
                         		(select c.npwd, 
                         					 a.t_vat_setllement_id,	
+                        					 a.t_customer_order_id,
                         					    a.payment_key,
                         						 c.company_name, 
                         						 b.code as periode_pelaporan, 

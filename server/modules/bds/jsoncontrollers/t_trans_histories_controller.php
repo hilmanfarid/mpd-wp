@@ -85,7 +85,7 @@ class t_trans_histories_controller extends wbController{
         $data = array('items' => array(), 'total' => 0, 'success' => false, 'message' => '');
 
         try{
-            $table =& wbModule::getModel('bds', 't_trans_histories',2);
+            $table =& wbModule::getModel('bds', 't_trans_histories',$t_cust_account_id);
 
             $items = $table->getAll($start, $limit, $sort, $dir);
             $total = $table->countAll();

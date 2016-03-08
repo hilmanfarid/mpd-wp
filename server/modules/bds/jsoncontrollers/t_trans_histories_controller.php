@@ -73,7 +73,7 @@ class t_trans_histories_controller extends wbController{
         extract($args);
 
         $start = wbRequest::getVarClean('start', 'int', 0);
-        $limit = 15; /*wbRequest::getVarClean('limit', 'int', 20);*/
+        $limit = wbRequest::getVarClean('limit', 'int', 0);
 
         $sort = wbRequest::getVarClean('sort', 'str', 'data_transaksi.start_date desc, t_vat_setllement_id');
         $dir = wbRequest::getVarClean('dir', 'str', 'asc');

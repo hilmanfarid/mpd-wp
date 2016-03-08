@@ -28,6 +28,7 @@ Bds.store.cust_acc_trans = function(config){
         }, [
             {name: 't_cust_acc_dtl_trans_id',type: 'int'},
             {name: 't_cust_account_id',type: 'int'},
+			{name: 'p_vat_type_dtl_id',type: 'int'},
             {name: 'npwd'},
             {name: 'trans_date', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'trans_date_txt'},

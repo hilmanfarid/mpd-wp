@@ -24,6 +24,19 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
         this.fields = {};
         this.jumlah_bulan=0;
         this.pengali_denda=0;
+		this.t_transaksi_harian= new Bds.module.t_transaksi_harian();
+		
+		this.editableWin = new Ext.Window({
+			title: 'Add',
+			layout: 'fit',
+			autoScroll: true,
+			y: 120,
+			width: 570,
+			height: 'auto',
+			modal: true,
+			closeAction: 'hide',
+			items: [this.t_transaksi_harian]
+		});
         this.fields.service_charge = new Ext.form.TextField({fieldLabel: 'Nama WP', name: 'service_charge', allowBlank: false, width:120});        
         this.fields.t_cust_account_id = new Ext.form.Hidden({fieldLabel: 'Nilai Omzet',allowNegative:false, name: 't_cust_account_id', allowBlank: true,width:220});
         this.fields.npwd = new Ext.form.TextField({fieldLabel: 'NPWPD', name: 'npwd', allowBlank: false,readOnly:true,width:220});
@@ -167,9 +180,12 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
 		this.kirimBtn = new Ext.Button({
 					 text:'KIRIM',
 					 handler:this.onCreate,
-					 scope:this})
-		
-				
+					 scope:this});
+					 
+		this.showTransBtn = new Ext.Button({
+					 text:'BUKA',
+					 handler:this.onShowTrans,
+					 scope:this});	
 		return [
             this.fields.t_cust_account_id,
             this.fields.percentage,
@@ -227,6 +243,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
                     }
                 ]
             },
+			this.showTransBtn,
 			this.fields.total_trans_amount,
             this.fields.total_vat_amount,
             this.fields.penalty_amount,
@@ -464,5 +481,22 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
         });
         
         return [this.btnSave, this.btnUpdate, this.btnCancel];
-    }
+    },
+	onShowTrans : function (){
+		//alert(this.t_transaksi_harian.toSource());
+		if(Ext.isEmpty(this.fields.start_period.getValue())||Ext.isEmpty(this.fields.end_period.getValue())|| Ext.isEmpty(this.fields.finance_period.getValue())){
+			Ext.Msg.alert('Warning', 'Periode, Periode Awal, dan Periode Akhir masih belum benar');
+			return;
+		}
+		this.editableWin.items.get(0).grid.fields.trans_date.setMinValue(this.fields.start_period.getValue());
+		this.editableWin.items.get(0).grid.fields.trans_date.setMaxValue(this.fields.end_period.getValue());
+		this.editableWin.items.get(0).grid.fields.trans_date.setValue(this.fields.start_period.getValue());
+		this.editableWin.items.get(0).grid.store.removeAll();
+		this.editableWin.items.get(0).grid.store.baseParams.t_cust_account_id=this.fields.t_cust_account_id.getValue();
+		this.editableWin.items.get(0).grid.store.baseParams.p_vat_type_dtl_id=this.fields.p_vat_type_dtl_id.getValue();  
+		this.editableWin.items.get(0).grid.store.baseParams.start_period=this.fields.start_period.getValue();
+		this.editableWin.items.get(0).grid.store.baseParams.end_period=this.fields.end_period.getValue();
+		this.editableWin.show();
+		this.editableWin.items.get(0).grid.store.load();
+	}
 });

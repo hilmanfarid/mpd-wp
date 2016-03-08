@@ -20,11 +20,11 @@ $sysConfig['DB.name'] = 'bds-tes';
 $sysConfig['DB.prefix'] = 'core';
 $sysConfig['DB.user'] = 'bds';
 $sysConfig['DB.password'] = 'bds';
-$sysConfig['DB.host'] = 'localhost';
+$sysConfig['DB.host'] = 'localhost:5444';
 $sysConfig['DB.type'] = 'postgres';
 
 /* Web Service Connection */
-$sysConfig['WS_SERVER'] = 'http://localhost:81/mpd-wp/server/wsdl.php?wsdl';
+$sysConfig['WS_SERVER'] = 'http://localhost/mpd-wp/server/wsdl.php?wsdl';
 
 /*
     Module Setting

@@ -27,6 +27,7 @@ HEREDOC;
         wbPage::addScriptCode($script);
         wbPage::addScript('modules/bds/views/script/properties.js');
         wbPage::addScript('modules/bds/views/script/GridPanel.js');
+		wbPage::addScript('modules/bds/views/script/EditorGridPanel.js');
         wbPage::addScript('modules/bds/views/script/FormPanel.js');
         wbPage::addScript('modules/bds/views/script/ModulePanel.js');
         wbPage::addScript('modules/base/views/script/roles-jsloader.php');

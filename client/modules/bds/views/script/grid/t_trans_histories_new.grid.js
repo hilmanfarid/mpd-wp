@@ -113,15 +113,18 @@ Bds.grid.t_trans_histories_new = Ext.extend(Webi.grid.GridPanel, {
 		this.npwd.store.load();
 		
         this.btnCetakSPTPD = new Ext.Button({text:'Cetak SPTPD', handler:this.cetakSPTPD, scope:this});
-		this.btnCetakDsr = new Ext.Button({text:'Cetak DSR', handler:this.cetakDsr, scope:this});
+        this.btnCetakSSPD = new Ext.Button({text:'Cetak SSPD', handler:this.cetakSSPD, scope:this});
+		this.btnCetakDsr = new Ext.Button({text:'Cetak Rekap Penjualan', handler:this.cetakDsr, scope:this});
 		this.btnCetakNoBayar = new Ext.Button({text:'Cetak No.Bayar', handler:this.cetakNoBayar, scope:this});
 		
 		buttons.push('-');
         buttons.push(this.npwd);
         buttons.push(this.btnCetakSPTPD);
-        buttons.push('-')
+        buttons.push('-');
+        buttons.push(this.btnCetakSSPD);
+        buttons.push('-');
         buttons.push(this.btnCetakDsr);
-        buttons.push('-')
+        buttons.push('-');
         buttons.push(this.btnCetakNoBayar);
         return buttons;
     },
@@ -165,12 +168,41 @@ Bds.grid.t_trans_histories_new = Ext.extend(Webi.grid.GridPanel, {
             }else {
                 Ext.Msg.show({
                     title:'Perhatian',
-                    msg: ('Maaf, Cetak SPTPD tidak dapat dilakukan karena data yang dipilih belum dibayar'),
+                    msg: ('Maaf, Cetak SPTPD tidak dapat dilakukan karena record yang dipilih belum dibayar'),
                     buttons: Ext.Msg.OK,
                     icon: Ext.MessageBox.INFO,
                     minWidth: 200
                 });
             }
+    },
+    
+    cetakSSPD : function(){
+        var rec = this.getSelectionModel().getSelected();
+        if (!rec) {
+            Ext.Msg.show({
+                title:'Perhatian',
+                msg: ('Pilih salah satu record'),
+                buttons: Ext.Msg.OK,
+                icon: Ext.MessageBox.INFO,
+                minWidth: 200
+            });
+            return false;
+        }
+        
+        if(!Ext.isEmpty(rec.get('kuitansi_pembayaran'))){
+            var t_customer_order_id = rec.get('t_customer_order_id');
+            var urlref = "http://45.118.112.231/mpd/report/cetak_formulir_sspd_pdf.php?t_customer_order_id="+t_customer_order_id; 
+            window.open(urlref, "_blank", "toolbar=0,location=0,menubar=0");
+        }else {
+            Ext.Msg.show({
+                title:'Perhatian',
+                msg: ('Maaf, Cetak SSPD tidak dapat dilakukan karena record yang dipilih belum dibayar'),
+                buttons: Ext.Msg.OK,
+                icon: Ext.MessageBox.INFO,
+                minWidth: 200
+            });        
+        }
+        
     },
     
     cetakDsr : function(){

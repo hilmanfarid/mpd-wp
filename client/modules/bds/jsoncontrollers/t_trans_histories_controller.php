@@ -42,7 +42,44 @@ class t_trans_histories_controller extends wbController{
         return $data;
 
     }
+    
+    
+    /**
+     * read
+     * controler for get all items
+     */
+    public static function read_histories($args = array()){
+        // Security check
+        //if (!wbSecurity::check('DHotel')) return;
+        // Get arguments from argument array
+        //extract($args);
 
+        $data = array('items' => array(), 'total' => 0, 'success' => false, 'message' => '');
+
+        try{
+            $ws_client = self::getNusoap();
+        
+		    $params = array('search' => '',
+					'getParams' => json_encode($_GET),
+					'controller' => json_encode(array('module' => 'bds','class' => 't_trans_histories', 'method' => 'read_histories', 'type' => 'json' )),
+					'postParams' => json_encode($_POST),
+					'jsonItems' => '',
+					'start' => $start,
+					'limit' => $limit);
+					
+            $ws_data = self::getResultData($ws_client, $params);
+            
+            $data['items'] = $ws_data ['data'];
+            $data['total'] = $ws_data ['total'];
+            $data['message'] = $ws_data ['message'];
+            $data['success'] = $ws_data ['success'];
+        }catch (Exception $e) {
+            $data['message'] = $e->getMessage();
+        }
+        return $data;
+
+    }
+    
     /**
      * create
      * controler for create new item

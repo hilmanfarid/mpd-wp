@@ -421,6 +421,8 @@ class t_vat_settlement_controller extends wbController{
 				//	$value = $DBConnect->f("ty_lov_npwd");		 
 				// }
 				 $t_cust_account_id = wbRequest::getVarClean('t_cust_account_id','int', 0);	
+				 $start_period = wbRequest::getVarClean('start_period','str', 0);	
+				 $end_period = wbRequest::getVarClean('end_period','str', 0);	
 				 //$i_t_cust_id = CCGetFromGet("t_cust_account_id","");
 				 //$i_t_cust_account_id = empty($i_t_cust_id) ? $value : $i_t_cust_id;
 		
@@ -430,8 +432,24 @@ class t_vat_settlement_controller extends wbController{
 		
 				 //$uploadForm->t_cust_account_id->SetValue($i_t_cust_account_id);
 				 //$uploadForm->trans_date->SetValue($i_tgl_trans);
+				 $jumlah_hari = substr($end_period,8,2) - substr($start_period,8,2) + 1;
+				 $tahun_bulan = substr($start_period,0,8);
+				 if ($jumlah_hari != ($xl_reader->sheets[0]['numRows']-1)){
+					 $data['message'] = "Laporan masa pajak anda ini tidak sesuai dengan Laporan Rekapitulasi Penerimaan Harian";
+					 $data['success'] = false;
+					 echo json_encode($data);
+					 exit;
+				 }
+				 
 				 $items= array();	
 				 for($i = 2; $i <= $xl_reader->sheets[0]['numRows']; $i++) {
+					   $temp_date = $tahun_bulan.sprintf("%02d", ($i-2+substr($start_period,8,2)));
+					   if ($temp_date != $xl_reader->sheets[0]['cells'][$i][1]){
+							 $data['message'] = "Laporan masa pajak anda ini tidak sesuai dengan Laporan Rekapitulasi Penerimaan Harian";
+							 $data['success'] = false;
+							 echo json_encode($data);
+							 exit;
+					   }
 					   $item['t_cust_account_id'] = $t_cust_account_id; 
 					   $item['i_tgl_trans'] =  $xl_reader->sheets[0]['cells'][$i][1]; 	
 					   $item['i_bill_no'] =  $xl_reader->sheets[0]['cells'][$i][2];
@@ -443,7 +461,7 @@ class t_vat_settlement_controller extends wbController{
 					   $item['p_vat_type_dtl_id'] = $temp_cust_account['items'][0]['p_vat_type_dtl_id'];                
 					   $items[]=$item;
 				 } 
-				 $_POST['p_vat_type_dtl_id']=$temp_cust_account['items'][0]['p_vat_type_dtl_id'];
+				 //$_POST['p_vat_type_dtl_id']=$temp_cust_account['items'][0]['p_vat_type_dtl_id'];
 				 $_POST['items']=json_encode($items);
 				 //echo json_encode($items); exit;
 				 $data = self::createCustAccTrans();

@@ -9,7 +9,7 @@ Bds.grid.t_trans_histories_new = Ext.extend(Webi.grid.GridPanel, {
     viewConfig:{forceFit:false},
     enableEdit:false,
 	firstTime:true,
-    
+    pageSize:15,
     plugins: [new Ext.ux.plugins.GroupHeaderGrid()],
     initComponent : function() {
         this.store = new Bds.store.t_trans_histories_new({autoLoad:false});

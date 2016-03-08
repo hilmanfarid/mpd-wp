@@ -43,7 +43,7 @@ Bds.store.cust_acc_trans = function(config){
             encode: true,
             writeAllFields: false
         }),
-        autoSave: false
+        autoSave: true
 	});
 	// call the superclass's constructor 
 	Bds.store.cust_acc_trans.superclass.constructor.call(this, config);

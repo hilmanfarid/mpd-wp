@@ -155,11 +155,26 @@ class cust_acc_trans_controller extends wbController{
                       from sikp.f_get_cust_acc_dtl_trans($t_cust_account_id,$trans_date)AS tbl (t_cust_acc_dtl_trans_id) 
                       left join p_finance_period on p_finance_period.start_date <= trans_date and p_finance_period.end_date >= trans_date
                       ".$table->getCriteriaSQL()." ORDER BY $sort $dir";
-        	$items = $table->dbconn->GetAllAssocLimit($query,$limit,$start);
+        	$items_from_db = $table->dbconn->GetAllAssocLimit($query,$limit,$start);
         	$query = '';
         	$query = "SELECT COUNT(1) from sikp.f_get_cust_acc_dtl_trans($t_cust_account_id,$trans_date) ".$table->getCriteriaSQL();
-        	
             $countitems = $table->dbconn->GetOne($query);
+			
+			for ($i = 0 ; $i < substr($end_period,8,2);$i++){
+				$item_transdate = date('Y-m-d',strtotime("+".$i." day",strtotime(substr($start_period,0,10))));
+				$items[$i] = array('trans_date' => $item_transdate, 
+						't_cust_acc_dtl_trans_id' => '', 't_cust_account_id' => $t_cust_account_id, 'bill_no' => '',
+						'service_desc' => '','service_charge' => '','vat_charge' => '','description' => '',
+						'p_vat_type_dtl_id' => $p_vat_type_dtl_id,'p_finance_period_id' => '');
+				
+				
+				foreach($items_from_db as $item){
+					if($item_transdate == $item['trans_date']){
+						$items[$i] = $item;
+					}
+				}
+			}
+			
             if ($countitems === false){
                 throw new Exception($dbConn_rwnet->ErrorMsg());
             }
@@ -365,7 +380,7 @@ class cust_acc_trans_controller extends wbController{
                         exit;*/
 						$tr_id = $table->dbconn->GetOne("select last_value from t_cust_acc_dtl_trans_seq");
 						$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no, service_desc, service_charge, vat_charge, description
-						  from sikp.f_get_cust_acc_dtl_trans(".$items[$i]["t_cust_account_id"].",'".$date_only[0]."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
+						  from sikp.f_get_cust_acc_dtl_trans(".$items[$i]["t_cust_account_id"].",'".$tgl_trans."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
 						$items_return[] = $table->dbconn->GetItem($query,array($tr_id));
                 	    $numSaved++;
                 	    
@@ -427,7 +442,7 @@ class cust_acc_trans_controller extends wbController{
 	        }
 	        
         }
-    
+		
         return $data;    
     }
 	
@@ -567,7 +582,7 @@ class cust_acc_trans_controller extends wbController{
             $data['message'] = 'Invalid items parameter';
             return $data;
         }
-        
+        $t_cust_account_id = wbRequest::getVarClean('t_cust_account_id', 'int', 0);
         $table =& wbModule::getModel('bds', 'cust_acc_trans');
         
         $table->actionType = 'UPDATE';
@@ -585,7 +600,10 @@ class cust_acc_trans_controller extends wbController{
         		}catch(Exception $e){
         			$errors[] = $e->getMessage();
         		}
-        		$items[$i] = array_merge($items[$i], $table->record);
+				$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no, service_desc, service_charge, vat_charge, description
+                      from sikp.f_get_cust_acc_dtl_trans(".$t_cust_account_id.",'".$date_only[0]."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
+    	       $items[$i] = $table->dbconn->GetItem($query,array($items[$i]['t_cust_acc_dtl_trans_id']));
+        		//$items[$i] = array_merge($items[$i], $table->record);
         	}
         	$numErrors = count($errors);
         	if (count($errors)){
@@ -596,17 +614,20 @@ class cust_acc_trans_controller extends wbController{
         	}
         	$data['items'] =$items;
         }else{
-	        try{
-	            $table->setRecord($items);
-	            $table->update();
+	       try{
+	           $table->setRecord($items);
+	           $table->update();
 
-	            $data['success'] = true;
-	            $data['message'] = 'Data berhasil di-update';
-	            
-	        }catch (Exception $e) {
-	            $data['message'] = $e->getMessage();
-	        }
-	        $data['items'] = array_merge($items, $table->record);
+	           $data['success'] = true;
+	           $data['message'] = 'Data berhasil di-update';
+	           
+	       }catch (Exception $e) {
+	           $data['message'] = $e->getMessage();
+	       }
+			$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no, service_desc, service_charge, vat_charge, description
+                      from sikp.f_get_cust_acc_dtl_trans(".$t_cust_account_id.",'".$date_only[0]."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
+    	   $data['items'] = $table->dbconn->GetItem($query,array($items['t_cust_acc_dtl_trans_id']));
+	      // $data['items'] = array_merge($items, $table->record);
         }
     
         return $data;    

@@ -151,19 +151,20 @@ class cust_acc_trans_controller extends wbController{
         	}else{
         	    $trans_date = "'".$trans_date."'";
         	}
-        	$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no, service_desc, service_charge, vat_charge, tbl.description,p_vat_type_dtl_id,p_finance_period_id
-                      from sikp.f_get_cust_acc_dtl_trans($t_cust_account_id,$trans_date)AS tbl (t_cust_acc_dtl_trans_id) 
+        	$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no,bill_no_end,bill_count, service_desc, service_charge, vat_charge, tbl.description,p_vat_type_dtl_id,p_finance_period_id
+                      from sikp.f_get_cust_acc_dtl_trans_v2($t_cust_account_id,$trans_date)AS tbl (t_cust_acc_dtl_trans_id) 
                       left join p_finance_period on p_finance_period.start_date <= trans_date and p_finance_period.end_date >= trans_date
                       ".$table->getCriteriaSQL()." ORDER BY $sort $dir";
         	$items_from_db = $table->dbconn->GetAllAssocLimit($query,$limit,$start);
         	$query = '';
-        	$query = "SELECT COUNT(1) from sikp.f_get_cust_acc_dtl_trans($t_cust_account_id,$trans_date) ".$table->getCriteriaSQL();
+        	$query = "SELECT COUNT(1) from sikp.f_get_cust_acc_dtl_trans_v2($t_cust_account_id,$trans_date) ".$table->getCriteriaSQL();
             $countitems = $table->dbconn->GetOne($query);
 			
 			for ($i = 0 ; $i < substr($end_period,8,2);$i++){
 				$item_transdate = date('Y-m-d',strtotime("+".$i." day",strtotime(substr($start_period,0,10))));
 				$items[$i] = array('trans_date' => $item_transdate, 
 						't_cust_acc_dtl_trans_id' => '', 't_cust_account_id' => $t_cust_account_id, 'bill_no' => '',
+						'bill_no_end' => '','bill_count' => '',
 						'service_desc' => '','service_charge' => '','vat_charge' => '','description' => '',
 						'p_vat_type_dtl_id' => $p_vat_type_dtl_id,'p_finance_period_id' => '');
 				
@@ -353,12 +354,14 @@ class cust_acc_trans_controller extends wbController{
                         }*/
         	            //$cust_id = $table->dbconn->GetOne("select t_cust_account_id".$session['user_id']);
 						$tgl_trans = empty($items[$i]["i_tgl_trans"]) ? $date_only[0] : $items[$i]["i_tgl_trans"];
-						$bill_no = empty($items[$i]["i_bill_no"]) ? $items[$i]["bill_no"] : $items[$i]["i_bill_no"];;
-						$serve_desc = empty($items[$i]["i_serve_desc"]) ? $items[$i]["service_desc"] : $items[$i]["i_serve_desc"];;
-						$serve_charge = empty($items[$i]["i_serve_charge"]) ? $items[$i]["service_charge"] : $items[$i]["i_serve_charge"];;
-						$description = empty($items[$i]["i_description"]) ? $items[$i]["description"] : $items[$i]["i_description"];;
+						$bill_no = empty($items[$i]["i_bill_no"]) ? $items[$i]["bill_no"] : $items[$i]["i_bill_no"];
+						$bill_no_end = empty($items[$i]["i_bill_no_end"]) ? $items[$i]["bill_no_end"] : $items[$i]["i_bill_no_end"];
+						$bill_count = empty($items[$i]["i_bill_count"]) ? $items[$i]["bill_count"] : $items[$i]["i_bill_count"];
+						$serve_desc = empty($items[$i]["i_serve_desc"]) ? $items[$i]["service_desc"] : $items[$i]["i_serve_desc"];
+						$serve_charge = empty($items[$i]["i_serve_charge"]) ? $items[$i]["service_charge"] : $items[$i]["i_serve_charge"];
+						$description = empty($items[$i]["i_description"]) ? $items[$i]["description"] : $items[$i]["i_description"];
                         $table->dbconn->Execute("select o_result_code, o_result_msg from \n" .
-                        "f_ins_cust_acc_dtl_trans(" . $items[$i]["t_cust_account_id"]. ",\n" .
+                        "f_ins_cust_acc_dtl_trans_v2(" . $items[$i]["t_cust_account_id"]. ",\n" .
                         "                         '" . $tgl_trans . "',\n" .
                         "                         '" . $bill_no. "',\n" .
                         "                         '" . $serve_desc. "',\n" .
@@ -367,7 +370,9 @@ class cust_acc_trans_controller extends wbController{
                         "                         '" . $description. "',\n" .
                         "                         '" . $session['user_name']. "',\n" .
                         "                         '" . $p_vat_type_dtl_id. "',\n" .
-                        "                         null)");
+                        "                         null,".
+						"                         " . $bill_count. ",".
+						"                         '" . $bill_no_end. "')");
                         /*echo "select o_result_code, o_result_msg from \n" .
                         "f_ins_cust_acc_dtl_trans(" . $items["t_cust_account_id"]. ",\n" .
                         "                         '" . $items[$i]["i_tgl_trans"]. "',\n" .
@@ -379,8 +384,8 @@ class cust_acc_trans_controller extends wbController{
                         "                         '" . $session['user_name']. "')";
                         exit;*/
 						$tr_id = $table->dbconn->GetOne("select last_value from t_cust_acc_dtl_trans_seq");
-						$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no, service_desc, service_charge, vat_charge, description
-						  from sikp.f_get_cust_acc_dtl_trans(".$items[$i]["t_cust_account_id"].",'".$tgl_trans."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
+						$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no,bill_no_end,bill_count, service_desc, service_charge, vat_charge, description
+						  from sikp.f_get_cust_acc_dtl_trans_v2(".$items[$i]["t_cust_account_id"].",'".$tgl_trans."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
 						$items_return[] = $table->dbconn->GetItem($query,array($tr_id));
                 	    $numSaved++;
                 	    
@@ -414,7 +419,7 @@ class cust_acc_trans_controller extends wbController{
     	            $date_only = explode('T', $items["trans_date"]); 
     	            //$cust_id = $table->dbconn->GetOne("select t_cust_account_id".$session['user_id']);
                     $table->dbconn->Execute("select o_result_code, o_result_msg from \n" .
-                    "f_ins_cust_acc_dtl_trans(" . $items["t_cust_account_id"]. ",\n" .
+                    "f_ins_cust_acc_dtl_trans_v2(" . $items["t_cust_account_id"]. ",\n" .
                     "                         '" . $date_only[0]. "',\n" .
                     "                         '" . $items["bill_no"]. "',\n" .
                     "                         null,\n" .
@@ -423,10 +428,12 @@ class cust_acc_trans_controller extends wbController{
                     "                         '" . $items["description"]. "',\n" .
                     "                         '" . $session['user_name']. "',\n" .
                     "                         " . $p_vat_type_dtl_id. ",\n" .
-                    "                         null)");
+                    "                         null,".
+					"                         " . $items["bill_count"]. ",".
+					"                         '" . $items["bill_no_end"]. "')");
     	            $tr_id = $table->dbconn->GetOne("select last_value from t_cust_acc_dtl_trans_seq");
-    	            $query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no, service_desc, service_charge, vat_charge, description
-                      from sikp.f_get_cust_acc_dtl_trans(".$items['t_cust_account_id'].",'".$date_only[0]."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
+    	            $query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no,bill_no_end,bill_count, service_desc, service_charge, vat_charge, description
+                      from sikp.f_get_cust_acc_dtl_trans_v2(".$items['t_cust_account_id'].",'".$date_only[0]."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
     	            $item = $table->dbconn->GetItem($query,array($tr_id));
     	            
     	            $data['success'] = true;
@@ -600,8 +607,8 @@ class cust_acc_trans_controller extends wbController{
         		}catch(Exception $e){
         			$errors[] = $e->getMessage();
         		}
-				$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no, service_desc, service_charge, vat_charge, description
-                      from sikp.f_get_cust_acc_dtl_trans(".$t_cust_account_id.",'".$date_only[0]."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
+				$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no,bill_no_end,bill_count, service_desc, service_charge, vat_charge, description
+                      from sikp.f_get_cust_acc_dtl_trans_v2(".$t_cust_account_id.",'".$date_only[0]."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
     	       $items[$i] = $table->dbconn->GetItem($query,array($items[$i]['t_cust_acc_dtl_trans_id']));
         		//$items[$i] = array_merge($items[$i], $table->record);
         	}
@@ -619,13 +626,13 @@ class cust_acc_trans_controller extends wbController{
 	           $table->update();
 
 	           $data['success'] = true;
-	           $data['message'] = 'Data berhasil di-update';
+	           $data['message'] = 'Data berhasil di-update nu ieu';
 	           
 	       }catch (Exception $e) {
 	           $data['message'] = $e->getMessage();
 	       }
-			$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no, service_desc, service_charge, vat_charge, description
-                      from sikp.f_get_cust_acc_dtl_trans(".$t_cust_account_id.",'".$date_only[0]."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
+			$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no,bill_no_end,bill_count, service_desc, service_charge, vat_charge, description
+                      from sikp.f_get_cust_acc_dtl_trans_v2(".$t_cust_account_id.",'".$date_only[0]."')AS tbl (t_cust_acc_dtl_trans_id) where t_cust_acc_dtl_trans_id = ?";
     	   $data['items'] = $table->dbconn->GetItem($query,array($items['t_cust_acc_dtl_trans_id']));
 	      // $data['items'] = array_merge($items, $table->record);
         }

@@ -33,6 +33,8 @@ Bds.store.cust_acc_trans = function(config){
             {name: 'trans_date', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'trans_date_txt'},
             {name: 'bill_no'},
+			{name: 'bill_no_end'},
+			{name: 'bill_count',type: 'float'},
             {name: 'service_desc'},
             {name: 'service_charge',type: 'float'},
             {name: 'vat_charge',type: 'float'},
@@ -43,7 +45,7 @@ Bds.store.cust_acc_trans = function(config){
             encode: true,
             writeAllFields: false
         }),
-        autoSave: true
+        autoSave: false
 	});
 	// call the superclass's constructor 
 	Bds.store.cust_acc_trans.superclass.constructor.call(this, config);

@@ -39,7 +39,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
 			layout: 'fit',
 			autoScroll: true,
 			y: 120,
-			width: 570,
+			width: 630,
 			height: 'auto',
 			modal: true,
 			closeAction: 'hide',

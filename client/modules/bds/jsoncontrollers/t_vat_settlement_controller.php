@@ -434,7 +434,7 @@ class t_vat_settlement_controller extends wbController{
 				 //$uploadForm->trans_date->SetValue($i_tgl_trans);
 				 $jumlah_hari = substr($end_period,8,2) - substr($start_period,8,2) + 1;
 				 $tahun_bulan = substr($start_period,0,8);
-				 if ($jumlah_hari != ($xl_reader->sheets[0]['numRows']-1)){
+				 if ($jumlah_hari != ($xl_reader->sheets[0]['numRows']-2)){
 					 $data['message'] = "Laporan masa pajak anda ini tidak sesuai dengan Laporan Rekapitulasi Penerimaan Harian";
 					 $data['success'] = false;
 					 echo json_encode($data);
@@ -442,8 +442,8 @@ class t_vat_settlement_controller extends wbController{
 				 }
 				 
 				 $items= array();	
-				 for($i = 2; $i <= $xl_reader->sheets[0]['numRows']; $i++) {
-					   $temp_date = $tahun_bulan.sprintf("%02d", ($i-2+substr($start_period,8,2)));
+				 for($i = 3; $i <= $xl_reader->sheets[0]['numRows']; $i++) {
+					   $temp_date = $tahun_bulan.sprintf("%02d", ($i-3+substr($start_period,8,2)));
 					   if ($temp_date != $xl_reader->sheets[0]['cells'][$i][1]){
 							 $data['message'] = "Laporan masa pajak anda ini tidak sesuai dengan Laporan Rekapitulasi Penerimaan Harian";
 							 $data['success'] = false;
@@ -452,8 +452,11 @@ class t_vat_settlement_controller extends wbController{
 					   }
 					   $item['t_cust_account_id'] = $t_cust_account_id; 
 					   $item['i_tgl_trans'] =  $xl_reader->sheets[0]['cells'][$i][1]; 	
-					   $item['i_bill_no'] =  $xl_reader->sheets[0]['cells'][$i][2];
-					   $item['i_serve_desc'] =  $xl_reader->sheets[0]['cells'][$i][3];
+					   $bills = explode("-", $xl_reader->sheets[0]['cells'][$i][2]);
+					   $item['i_bill_no'] =  $bills[0];
+					   $item['i_bill_no_end'] =  $bills[1];
+					   $item['i_bill_count'] =  $xl_reader->sheets[0]['cells'][$i][3];
+					   $item['i_serve_desc'] =  '';
 					   $item['i_serve_charge'] =  $xl_reader->sheets[0]['cells'][$i][4];
 					   //$i_vat_charge = $xl_reader->sheets[0]['cells'][$i][4];
 					   $item['i_vat_charge'] = "null";

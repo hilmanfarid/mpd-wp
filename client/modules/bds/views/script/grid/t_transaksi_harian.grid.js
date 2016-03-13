@@ -21,7 +21,9 @@ Bds.grid.t_transaksi_harian = Ext.extend(Webi.grid.EditorGridPanel, {
         this.fields.npwd = new Ext.form.TextField({name: 'npwd', allowBlank: false, width:0});
         this.fields.trans_date = new Ext.form.DateField({name: 'trans_date', allowBlank: true, format: 'Y-m-d'});
         this.fields.trans_date_txt = new Ext.form.Hidden({name: 'trans_date_txt', allowBlank: false, width:0});
-        this.fields.bill_no = new Ext.form.TextField({name: 'bill_no', allowBlank: false, width:100});
+        this.fields.bill_no = new Ext.form.TextField({name: 'bill_no', allowBlank: false, width:200});
+		this.fields.bill_no_end = new Ext.form.TextField({name: 'bill_no_end', allowBlank: false, width:200});
+		this.fields.bill_count = new Ext.form.NumberField({name: 'bill_count', allowBlank: false,allowDecimals:true, width:50});
         this.fields.service_desc = new Ext.form.Hidden({name: 'service_desc', allowBlank: false, width:0});
         this.fields.service_charge = new Ext.form.NumberField({name: 'service_charge', allowBlank: false,allowDecimals:true, width:50});
         this.fields.vat_charge = new Ext.form.TextField({name: 'vat_charge', allowBlank: false, width:70});
@@ -44,19 +46,27 @@ Bds.grid.t_transaksi_harian = Ext.extend(Webi.grid.EditorGridPanel, {
 			},
 			{
 				header: 'Tanggal',
-				dataIndex: 'trans_date', sortable: true, hidden: false,renderer: Webi.format.dateRenderer
+				dataIndex: 'trans_date', sortable: true, hidden: false,renderer: Webi.format.dateRenderer, width:70
 			},
 			{
-				header: 'No Faktur', editor: this.fields.bill_no,
-				dataIndex: 'bill_no', sortable: true, hidden: false
+				header: 'No. Urut Faktur Awal', editor: this.fields.bill_no,
+				dataIndex: 'bill_no', sortable: true, hidden: false, width:120
 			},
 			{
-				header: 'Jumlah Penjualan', editor: this.fields.service_charge,
-				dataIndex: 'service_charge', sortable: true, hidden: false
+				header: 'No. Urut Faktur Akhir', editor: this.fields.bill_no_end,
+				dataIndex: 'bill_no_end', sortable: true, hidden: false, width:120
+			},
+			{
+				header: 'Jumlah Faktur', editor: this.fields.bill_count,align:'right',
+				dataIndex: 'bill_count', sortable: true, hidden: false, width:90
+			},
+			{
+				header: 'Jumlah Penjualan', editor: this.fields.service_charge, align:'right',
+				dataIndex: 'service_charge', sortable: true, hidden: false, width:130
 			},
 			{
 				header: 'Deskripsi', editor: this.fields.description,
-				dataIndex: 'description', sortable: true, hidden: false
+				dataIndex: 'description', sortable: true, hidden: false, width:70
 			}
         ];
         // super
@@ -79,6 +89,8 @@ Bds.grid.t_transaksi_harian = Ext.extend(Webi.grid.EditorGridPanel, {
             'npwd' : '',
             'trans_date' : '',
             'bill_no' : '',
+			'bill_no_end' : '',
+			'bill_count' : '',
             'service_desc' : '',
             'service_charge' : '',
             'vat_charge' : '',

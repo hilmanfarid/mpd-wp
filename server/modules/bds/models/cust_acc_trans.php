@@ -18,6 +18,8 @@ class cust_acc_trans extends AbstractTable{
                            'trans_date' => array('type' => 'str', 'nullable' => true, 'unique' => false, 'display' => 'description'),
                            'description' => array('type' => 'str', 'nullable' => true, 'unique' => false, 'display' => 'description'),
                            'bill_no' => array('type' => 'str', 'nullable' => true, 'unique' => false, 'display' => 'bill_no'),
+						   'bill_no_end' => array('type' => 'str', 'nullable' => true, 'unique' => false, 'display' => 'bill_no_end'),
+						   'bill_count' => array('type' => 'str', 'nullable' => true, 'unique' => false, 'display' => 'bill_count'),
                            'service_charge' => array('type' => 'float', 'nullable' => true, 'unique' => false, 'display' => 'service_charge'),
                            'vat_charge' => array('type' => 'float', 'nullable' => true, 'unique' => false, 'display' => 'vat_charge'),
                            'p_vat_type_dtl_id' => array('type' => 'int', 'nullable' => false, 'unique' => false, 'display' => 'p_vat_type_dtl_id'),

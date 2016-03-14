@@ -364,7 +364,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
             return;
         }
         var params=this.fields.payment_key.getValue();
-        window.open("ws.php?type=json&module=bds&class=t_vat_settlement&method=printNoBayar&no_bayar="+params, "_blank", "toolbar=0,location=0,menubar=0");
+        window.open("http://45.118.112.231/mpd/report/cetak_no_bayar.php?no_bayar="+params, "_blank", "toolbar=0,location=0,menubar=0");
     },
     submitPembayaran : function(thisform){
         var params = {'user_name' : _UNAME,

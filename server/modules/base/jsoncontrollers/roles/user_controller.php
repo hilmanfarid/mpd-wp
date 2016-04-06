@@ -284,10 +284,11 @@ class user_controller extends wbController{
             
             $table =& wbModule::getModel('base', 'roles.user');
 			$sql = "select b.p_app_user_id as user_id, b.user_name, 
-				a.wp_email as user_email, a.wp_name as user_realname, c.code as user_status,".$sessionInfo['roles'][0]['role_id']." as role_id,'".$sessionInfo['roles'][0]['role_name']."' as role_name
+				d.email_address  as user_email,a.mobile_no, a.company_brand as user_realname, c.code as user_status,".$sessionInfo['roles'][0]['role_id']." as role_id,'".$sessionInfo['roles'][0]['role_name']."' as role_name
 				from t_cust_account a
 				left join t_customer_user b on a.t_customer_id = b.t_customer_id
 				left join p_account_status c on c.p_account_status_id = a.p_account_status_id
+				left join p_app_user d on d.p_app_user_id=b.p_app_user_id
 				where b.p_app_user_id = ".$uid;
 			
 			$data ['items']=$table->dbconn->GetItem($sql);
@@ -311,6 +312,7 @@ class user_controller extends wbController{
 		$user_password2 = trim(wbRequest::getVarClean('user_password2', 'str', ''));
 
 		$user_email = trim(wbRequest::getVarClean('user_email', 'str', ''));
+		$mobile_no = trim(wbRequest::getVarClean('mobile_no', 'str', ''));
 		$user_realname = trim(wbRequest::getVarClean('user_realname', 'str', ''));
 
         $data = array('items' => array(), 'total' => 0, 'success' => false, 'message' => '');
@@ -340,6 +342,12 @@ class user_controller extends wbController{
 	        
 	        $table->setRecord($record );
 	        $table->update();
+			
+			$sql = "update t_cust_account a
+					set a.mobile_no = '".$mobile_no."'
+					where t_customer_id = (select t_customer_id from t_customer_user where p_app_user_id = ".$uid.")";
+			
+			$data ['items']=$table->dbconn->GetItem($sql);
         
 	        $data['success'] = true;
 	        $data['message'] = 'Data berhasil di-update';

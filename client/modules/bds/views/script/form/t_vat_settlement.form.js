@@ -13,7 +13,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
     initComponent : function() {
         // super
         Bds.form.t_vat_settlement.superclass.initComponent.call(this);
-        //this.btnSave.setText('Kirim');
+        this.btnSave.setText('Kirim');
     },
 
     /**
@@ -78,7 +78,8 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
             
         },this);
         this.on('loadrecord', function(form, record, actionType){
-			this.kirimBtn.enable();
+			//this.kirimBtn.enable();
+			this.btnSave.enable();
             if (actionType == 'update'){
                 this.fields.p_vat_type_dtl_id.store.baseParams.p_vat_type_dtl_id = this.fields.p_vat_type_dtl_id.getValue();
                 this.fields.p_vat_type_dtl_id.getStore().load({params: {p_vat_type_dtl_id:record.get('p_vat_type_dtl_id')}});
@@ -194,6 +195,9 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
 					 text:'ISI FORM TRANSAKSI HARIAN',
 					 handler:this.onShowTrans,
 					 scope:this});	
+					 
+		this.fields.payment_key.hide();
+					 
 		return [
             this.fields.t_cust_account_id,
             this.fields.percentage,
@@ -262,8 +266,8 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
 			this.fields.total_trans_amount,
             this.fields.total_vat_amount,
             this.fields.penalty_amount,
-            this.fields.total_amount, 
-			{
+            this.fields.total_amount
+			/*{
                 xtype: 'panel',
 			    baseCls: 'x-plain',
 			    border: false,
@@ -284,7 +288,7 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
                     }
                 ]
             },
-            this.fields.payment_key
+            this.fields.payment_key*/
         ];
     },
     focusField: function(){
@@ -396,8 +400,9 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
                 thisform.fields.payment_key.setValue(action.result.items.o_pay_key);
                 //thisform.fields.penalty_amount.setValue(action.result.items.penalty);
                 //thisform.fields.total_amount.setValue(thisform.fields.total_vat_amount.getValue()+thisform.fields.penalty_amount.getValue());
-                if(!Ext.isEmpty(action.result.items.o_pay_key)&&action.result.items.o_pay_key!=null){
-                    thisform.kirimBtn.disable();
+                if(!Ext.isEmpty(action.result.items.o_vat_set_id)&&action.result.items.o_vat_set_id!=null){
+                    //thisform.kirimBtn.disable();
+					thisform.btnSave.disable();
                 }
                 //window.open("http://172.16.20.2:81/mpd/report/cetak_duplikat_kwitansi_bphtb.php"+params, "_blank", "toolbar=0,location=0,menubar=0");
                 //location.href="172.16.20.2/mpd/report/cetak_duplikat_kwitansi_bphtb.php"+params;
@@ -522,9 +527,9 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
 	buildUI: function(){
         this.btnSave = new Ext.Button({
         	itemId: 'btnSave',
-            text: 'CETAK NO. BAYAR',
+            text: 'Kirim',
             iconCls: 'icon-save',
-            handler: this.printNoBayar,
+            handler: this.onCreate,
             scope: this
         });
         

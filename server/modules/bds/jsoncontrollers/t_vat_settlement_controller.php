@@ -313,22 +313,23 @@ class t_vat_settlement_controller extends wbController{
                 $item['p_vat_type_dtl_cls_id'] = 'null';
             }
             $sql = "select o_mess,o_pay_key,o_cust_order_id,o_vat_set_id from f_vat_settlement_manual_wp(".$item['t_cust_account_id'].",".$item['finance_period'].",'".$item['npwd']."','".$item['start_period']."','".$item['end_period']."',null,".$item['total_trans_amount'].",".$item['total_vat_amount'].",".$item['p_vat_type_dtl_id'].",".$item['p_vat_type_dtl_cls_id'].", '".$user_name."')";
+			//$sql = "select -99 as o_mess,-99 as o_pay_key,-99 as o_cust_order_id,-99 as o_vat_set_id";
 			//$data['items'] = $sql;
 			//return $data;
             $message = $table->dbconn->GetAll($sql);
             $sql = "select * from f_get_penalty_amt(".$item['total_vat_amount'].",".$item['finance_period'].",".$item['p_vat_type_dtl_id'].");";
             $penalty = $table->dbconn->GetOne($sql);
             $message[0]['penalty']=$penalty;
-            if($message[0]['o_pay_key'] == null ||empty($message[0]['o_pay_key'])){
+            if($message[0]['o_vat_set_id'] == null ||empty($message[0]['o_vat_set_id'])){
                 $data['success'] = false;
             }else{
                 $data['success'] = true;
 				$params = json_encode(array(
-											't_vat_settlement'=>$message[0]['o_vat_set_id'],
+											't_vat_setllement_id'=>$message[0]['o_vat_set_id'],
 											't_customer_order_id'=>$message[0]['o_cust_order_id']
 											));
 				$_POST ['items']= $params;
-				self::submitSptpd();
+				$data = self::submitSptpd();
             }
             $data['items'] = $message[0];
             $data['message'] = $message[0]['o_mess'];
@@ -352,7 +353,8 @@ class t_vat_settlement_controller extends wbController{
             $user_name = wbSession::getVar('user_name');
             //f_before_submit_sptpd_wp(in_vat_setlement_id in number, i_user_name in varchar2) return varchar2
             //foreach($items as $item){
-                //$sql="select sikp.f_first_submit_engine(501,".$item['t_customer_order_id'].",'".$user_name."')";   
+                //$sql="select sikp.f_first_submit_engine(501,".$item['t_customer_order_id'].",'".$user_name."')";  
+								
                 $sql = "select sikp.f_before_submit_sptpd_wp(".$items['t_vat_setllement_id'].",'".$user_name."')";
                 $message=$table->dbconn->GetOne($sql);
                 //if(trim($message)=='OK'){

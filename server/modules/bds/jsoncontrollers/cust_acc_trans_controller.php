@@ -72,11 +72,12 @@ class cust_acc_trans_controller extends wbController{
         	}else{
         	    $trans_date = "'".$trans_date."'";
         	}
-        	$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no, service_desc, service_charge, vat_charge, description,p_vat_type_dtl_id
-                      from sikp.f_get_cust_acc_dtl_trans_exist($t_cust_account_id,$trans_date)AS tbl (t_cust_acc_dtl_trans_id) ".$table->getCriteriaSQL()." ORDER BY $sort $dir";
+        	$query = "select to_char(trans_date,'yyyy-mm-dd') as trans_date,t_cust_acc_dtl_trans_id, t_cust_account_id, bill_no,bill_no_end,bill_count, service_desc, service_charge, vat_charge, description,p_vat_type_dtl_id
+                      from sikp.f_get_cust_acc_dtl_trans_exist_v2($t_cust_account_id,$trans_date)AS tbl (t_cust_acc_dtl_trans_id) ".$table->getCriteriaSQL()." ORDER BY $sort $dir";
+			
         	$items = $table->dbconn->GetAllAssocLimit($query,$limit,$start);
         	$query = '';
-        	$query = "SELECT COUNT(1) from sikp.f_get_cust_acc_dtl_trans_exist($t_cust_account_id,$trans_date) ".$table->getCriteriaSQL();
+        	$query = "SELECT COUNT(1) from sikp.f_get_cust_acc_dtl_trans_exist_v2($t_cust_account_id,$trans_date) ".$table->getCriteriaSQL();
         	
             $countitems = $table->dbconn->GetOne($query);
             if ($countitems === false){

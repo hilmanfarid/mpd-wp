@@ -42,6 +42,7 @@ Base.properties.user_id= "ID User";
 Base.properties.user_name= "Nama User";
 Base.properties.user_password= "Password";
 Base.properties.user_email= "Email";
+Base.properties.mobile_no= "No. HP";
 Base.properties.user_realname= "Nama Lengkap";
 Base.properties.user_status= "Status";
 

@@ -37,7 +37,8 @@ Base.form.user = Ext.extend(Webi.form.FormPanel, {
 		this.fields.user_password = new Ext.form.TextField({fieldLabel: passwordLabel, name: 'user_password1', allowBlank: true, anchor: '95%', inputType: 'password', maxLength: 255});
 		this.fields.user_repass = new Ext.form.TextField({fieldLabel: 'Ulangi Password', name: 'user_password2', allowBlank: true, anchor: '95%', inputType: 'password', maxLength: 255});
 		this.fields.user_realname = new Ext.form.TextField({fieldLabel: Base.properties.user_realname, name: 'user_realname', allowBlank: false, anchor: '95%', maxLength: 255});
-		this.fields.user_email = new Ext.form.TextField({fieldLabel: Base.properties.user_email, name: 'user_email', allowBlank: true, anchor: '95%', maxLength: 255, vtype: 'email'});
+		this.fields.user_email = new Ext.form.TextField({fieldLabel: Base.properties.user_email, name: 'user_email', allowBlank: false, anchor: '95%', maxLength: 255, vtype: 'email'});
+		this.fields.mobile_no = new Ext.form.TextField({fieldLabel: Base.properties.mobile_no, name: 'mobile_no', allowBlank: false, anchor: '95%', maxLength: 255});
 
         if (this.hideStatus === true){
             this.fields.user_status = new Ext.form.Hidden({name: 'user_status', allowBlank: true});
@@ -118,6 +119,7 @@ Base.form.user = Ext.extend(Webi.form.FormPanel, {
 			this.fields.user_repass,
 			this.fields.user_realname,
 			this.fields.user_email,
+			this.fields.mobile_no,
 			this.fields.role_id,
 			this.fields.user_status
         ];
@@ -134,6 +136,18 @@ Base.form.user = Ext.extend(Webi.form.FormPanel, {
         if (this.fields.user_name.getValue().trim() == ''){
             this.fields.user_name.setValue('');
             this.fields.user_name.markInvalid('Nama User tidak boleh kosong');
+            valid = false;
+        }
+		
+		if (this.fields.user_email.getValue().trim() == ''){
+            this.fields.user_email.setValue('');
+            this.fields.user_email.markInvalid('Email tidak boleh kosong');
+            valid = false;
+        }
+		
+		if (this.fields.mobile_no.getValue().trim() == ''){
+            this.fields.mobile_no.setValue('');
+            this.fields.mobile_no.markInvalid('No. HP tidak boleh kosong');
             valid = false;
         }
 

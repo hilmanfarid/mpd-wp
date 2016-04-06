@@ -17,7 +17,6 @@ class transaksi_harian_controller extends wbController{
 					'limit' => $limit);
 					
             $ws_data = self::getResultData($ws_client, $params);
-           
         }catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -54,7 +53,12 @@ class transaksi_harian_controller extends wbController{
     	$i=1;
     	$pdf->SetAligns(array('L','L','L','R'));
     	foreach($param_arr as $item){
-    	    $pdf->RowMultiBorderWithHeight(array($i,$item['trans_date'],$item['bill_no'],'Rp. '.number_format($item['service_charge'],2,'.',',')),array('LTBR','LTBR','LTBR'),6);
+			if ($item['bill_no_end']!=''){
+				$bill_no = $item['bill_no'].'-'.$item['bill_no_end'];
+			}else{
+				$bill_no = $item['bill_no'];
+			}
+    	    $pdf->RowMultiBorderWithHeight(array($i,$item['trans_date'],$bill_no,'Rp. '.number_format($item['service_charge'],2,'.',',')),array('LTBR','LTBR','LTBR'),6);
     	    $i++;
     	}
     	$pdf->Output("","I");

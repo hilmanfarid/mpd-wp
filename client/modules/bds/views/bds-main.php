@@ -207,7 +207,7 @@ Ext.onReady(function(){
                               this.userAccountWin.statusbar.showBusy();    
                         }, this);
                         
-                        this.userAccountWin = new Webi.WinForm({title: 'Update Account Info', width:400, height:255, items: this.userAccountForm});
+                        this.userAccountWin = new Webi.WinForm({title: 'Update Account Info', width:400, height:300, items: this.userAccountForm});
                 		this.userAccountWin.on('hide', function(w){
                 			this.userAccountForm.reset();
                 		}, this);		

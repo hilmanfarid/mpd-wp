@@ -476,11 +476,13 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
 	        params: {
 				't_cust_account_id' : this.fields.t_cust_account_id.getValue(),
 				'p_vat_type_dtl_id' : this.fields.p_vat_type_dtl_id.getValue(),
+				'p_vat_type_dtl_cls_id' : this.fields.p_vat_type_dtl_cls_id.getValue(),
 				'start_period' : Ext.util.Format.date(this.fields.start_period.getValue(), 'Y-m-d'),
 				'end_period' : Ext.util.Format.date(this.fields.end_period.getValue(), 'Y-m-d'),
     			items: Ext.encode({
 					't_cust_account_id' : this.fields.t_cust_account_id.getValue(),
 					'p_vat_type_dtl_id' : this.fields.p_vat_type_dtl_id.getValue(),
+					'p_vat_type_dtl_cls_id' : this.fields.p_vat_type_dtl_cls_id.getValue(),
 					'start_period' : Ext.util.Format.date(this.fields.start_period.getValue(), 'Y-m-d'),
 					'end_period' : Ext.util.Format.date(this.fields.end_period.getValue(), 'Y-m-d')
 				})

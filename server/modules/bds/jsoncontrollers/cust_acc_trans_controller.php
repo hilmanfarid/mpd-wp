@@ -325,8 +325,11 @@ class cust_acc_trans_controller extends wbController{
         $jsonItems = wbRequest::getVarClean('items', 'str', '');
         
         $items =& wbUtil::jsonDecode($jsonItems);
+		
         $t_cust_account_id = wbRequest::getVarClean('t_cust_account_id', 'int', 0);
         $p_vat_type_dtl_id = wbRequest::getVarClean('p_vat_type_dtl_id', 'int', 0);
+		$p_vat_type_dtl_cls_id = wbRequest::getVarClean('p_vat_type_dtl_cls_id', 'int', 0);
+		
         if (!is_array($items)){
             $data['message'] = 'Invalid items parameter';
             return $data;
@@ -371,7 +374,7 @@ class cust_acc_trans_controller extends wbController{
                         "                         '" . $description. "',\n" .
                         "                         '" . $session['user_name']. "',\n" .
                         "                         '" . $p_vat_type_dtl_id. "',\n" .
-                        "                         null,".
+                        "                         case when " . $p_vat_type_dtl_cls_id. " = 0 then null else " . $p_vat_type_dtl_cls_id. " end,".
 						"                         " . $bill_count. ",".
 						"                         '" . $bill_no_end. "')");
                         /*echo "select o_result_code, o_result_msg from \n" .
@@ -429,7 +432,7 @@ class cust_acc_trans_controller extends wbController{
                     "                         '" . $items["description"]. "',\n" .
                     "                         '" . $session['user_name']. "',\n" .
                     "                         " . $p_vat_type_dtl_id. ",\n" .
-                    "                         null,".
+                    "                         case when " . $p_vat_type_dtl_cls_id. " = 0 then null else " . $p_vat_type_dtl_cls_id. " end,".
 					"                         " . $items["bill_count"]. ",".
 					"                         '" . $items["bill_no_end"]. "')");
     	            $tr_id = $table->dbconn->GetOne("select last_value from t_cust_acc_dtl_trans_seq");

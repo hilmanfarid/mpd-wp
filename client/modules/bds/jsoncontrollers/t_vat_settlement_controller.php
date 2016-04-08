@@ -462,6 +462,7 @@ class t_vat_settlement_controller extends wbController{
 					   $item['i_vat_charge'] = "null";
 					   $item['i_desc'] = $xl_reader->sheets[0]['cells'][$i][5];   
 					   $item['p_vat_type_dtl_id'] = $temp_cust_account['items'][0]['p_vat_type_dtl_id'];                
+					   $item['p_vat_type_dtl_cls_id'] = $temp_cust_account['items'][0]['p_vat_type_dtl_cls_id'];                
 					   $items[]=$item;
 				 } 
 				 //$_POST['p_vat_type_dtl_id']=$temp_cust_account['items'][0]['p_vat_type_dtl_id'];

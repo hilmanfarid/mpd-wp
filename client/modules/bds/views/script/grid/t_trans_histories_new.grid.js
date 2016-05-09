@@ -143,19 +143,19 @@ Bds.grid.t_trans_histories_new = Ext.extend(Webi.grid.GridPanel, {
             var urlref;
             if(!Ext.isEmpty(rec.get('kuitansi_pembayaran'))){
                 if (reqId == '1'){
-                        urlref=window.location.origin+"/mpd/report/cetak_sptpd_hotel_pdf.php?t_vat_setllement_id="+pid;
+                        urlref="http://45.118.112.231/mpd/report/cetak_sptpd_hotel_pdf.php?t_vat_setllement_id="+pid;
                         window.open(urlref, "_blank", "toolbar=0,location=0,menubar=0");
                 }else if(reqId == '2'){
-                        urlref=window.location.origin+"/mpd/report/cetak_sptpd_restoran_pdf.php?t_vat_setllement_id="+pid;
+                        urlref="http://45.118.112.231/mpd/report/cetak_sptpd_restoran_pdf.php?t_vat_setllement_id="+pid;
                         window.open(urlref, "_blank", "toolbar=0,location=0,menubar=0");
                 }else if(reqId == 3){
-                        lurlref=window.location.origin+"/mpd/report/cetak_sptpd_hiburan_pdf.php?t_vat_setllement_id="+pid;
+                        lurlref="http://45.118.112.231/mpd/report/cetak_sptpd_hiburan_pdf.php?t_vat_setllement_id="+pid;
                         window.open(urlref, "_blank", "toolbar=0,location=0,menubar=0");
                 }else if(reqId == 4){
-                        urlref=window.location.origin+"/mpd/report/cetak_sptpd_parkir_pdf.php?t_vat_setllement_id="+pid;
+                        urlref="http://45.118.112.231/mpd/report/cetak_sptpd_parkir_pdf.php?t_vat_setllement_id="+pid;
                         window.open(urlref, "_blank", "toolbar=0,location=0,menubar=0");
                 }else if(reqId == 5){
-                        urlref=window.location.origin+"/mpd/report/cetak_sptpd_ppj_pdf.php?t_vat_setllement_id="+pid;
+                        urlref="http://45.118.112.231/mpd/report/cetak_sptpd_ppj_pdf.php?t_vat_setllement_id="+pid;
                         window.open(urlref, "_blank", "toolbar=0,location=0,menubar=0");
                 }else{
                         alert("Jenis Permohonan Tidak Diketahui");      
@@ -186,7 +186,7 @@ Bds.grid.t_trans_histories_new = Ext.extend(Webi.grid.GridPanel, {
         
         if(!Ext.isEmpty(rec.get('kuitansi_pembayaran'))){
             var t_customer_order_id = rec.get('t_customer_order_id');
-            var urlref = window.location.origin+"/mpd/report/cetak_formulir_sspd_pdf.php?t_customer_order_id="+t_customer_order_id; 
+            var urlref = "http://45.118.112.231/mpd/report/cetak_formulir_sspd_pdf.php?t_customer_order_id="+t_customer_order_id; 
             window.open(urlref, "_blank", "toolbar=0,location=0,menubar=0");
         }else {
             Ext.Msg.show({
@@ -241,7 +241,7 @@ Bds.grid.t_trans_histories_new = Ext.extend(Webi.grid.GridPanel, {
         
         var no_bayar = rec.get('payment_key');
         if(!Ext.isEmpty(no_bayar)) {
-            var urlref = window.location.origin+"/mpd/report/cetak_no_bayar.php?no_bayar="+no_bayar; 
+            var urlref = "http://45.118.112.231/mpd/report/cetak_no_bayar.php?no_bayar="+no_bayar; 
             window.open(urlref, "_blank", "toolbar=0,location=0,menubar=0");
         }else {
             Ext.Msg.show({

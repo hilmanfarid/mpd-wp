@@ -76,7 +76,13 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
             this.fields.p_vat_type_dtl_cls_id.store.load();
             this.fields.p_vat_type_dtl_cls_id.setValue();
             
+			if (this.fields.p_vat_type_dtl_id.getValue()==11){
+				this.fields.total_trans_amount.setReadOnly(false);
+			}else{
+				this.fields.total_trans_amount.setReadOnly(true);
+			}	
         },this);
+		
         this.on('loadrecord', function(form, record, actionType){
 			//this.kirimBtn.enable();
 			this.btnSave.enable();
@@ -102,9 +108,21 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
             this.fields.percentage.setValue(rec.get('vat_pct'));  
 			this.hitungPajak();
         },this);
-        this.fields.total_trans_amount = new Ext.ux.NumericField({style : 'background: #00FF00;text-align:right;',useThousandSeparator: true,enableKeyEvents:true,decimalPrecision:2,fieldLabel: 'Nilai Omzet',allowNegative:false, name: 'total_trans_amount', allowBlank: true,readOnly:true,width:220});
+        //if (this.fields.p_vat_type_dtl_id.getValue()==11){
+		this.fields.total_trans_amount = new Ext.ux.NumericField({style : 'background: #00FF00;text-align:right;',useThousandSeparator: true,enableKeyEvents:true,decimalPrecision:2,fieldLabel: 'Nilai Omzet',allowNegative:false, name: 'total_trans_amount', allowBlank: true,readOnly:true,width:220});
+		//}else{
+		//	this.fields.total_trans_amount = new Ext.ux.NumericField({style : 'background: #00FF00;text-align:right;',useThousandSeparator: true,enableKeyEvents:true,decimalPrecision:2,fieldLabel: 'Nilai Omzet',allowNegative:false, name: 'total_trans_amount', allowBlank: true,readOnly:true,width:220});
+		//}
 		this.fields.total_trans_amount.on('keyup',function(form,e){
             this.hitungPajak();
+        },this);
+		
+		this.fields.total_trans_amount.on('load',function(form,e){
+            if (this.fields.p_vat_type_dtl_id.getValue()==11){
+				this.fields.total_trans_amount.setReadOnly(false);
+			}else{
+				this.fields.total_trans_amount.setReadOnly(true);
+			}	
         },this);
 		this.fields.start_period = new Ext.form.DateField({fieldLabel: 'Masa Pajak', name: 'start_period',width:100, allowBlank: true, format: 'd-m-Y'});
 		this.fields.end_period = new Ext.form.DateField({fieldLabel: 's/d', name: 'end_period', allowBlank: true,width:100,format: 'd-m-Y'});
@@ -115,6 +133,11 @@ Bds.form.t_vat_settlement = Ext.extend(Webi.form.FormPanel, {
             if(Ext.isEmpty(this.fields.percentage.getValue())){
                 this.fields.percentage.setValue(rec[0].get('vat_pct'));
             }
+			if (this.fields.p_vat_type_dtl_id.getValue()==11){
+				this.fields.total_trans_amount.setReadOnly(false);
+			}else{
+				this.fields.total_trans_amount.setReadOnly(true);
+			}
         },this);
         this.fields.penalty_amount = new Ext.ux.NumericField({style : 'background: #00FF00;text-align:right;',fieldLabel: 'Denda',allowNegative:false, name: 'penalty_amount', allowBlank: true,width:220,readOnly:true});
 		this.fields.total_amount = new Ext.ux.NumericField({style : 'background: #00FF00;text-align:right;',fieldLabel: 'Total yg Harus Dibayar',allowNegative:false, name: 'total_amount', allowBlank: true,width:220,readOnly:true});

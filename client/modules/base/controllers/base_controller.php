@@ -157,7 +157,7 @@ class base_controller extends wbController{
 					'limit' => $limit);
 
         wbUser::delSession();
-        wbResponse::Redirect('index.php');
+        wbResponse::Redirect('http://45.118.112.232:81/portal/');
     }
 
     public static function mains()
